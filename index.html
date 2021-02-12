@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <title>GitLab CVSS Calculator</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <link href="/css/application.css" rel="stylesheet">
+  <meta name="theme-color" content="#7952b3">
+</head>
+
+<body>
+  <main class="container">
+    <div id="app">
+      <question v-bind:question="current_question"></question>
+    </div>
+  </main>
+
+  <script type="text/x-template" id="answer-template">
+    <div class="col-sm-6">
+      <div class="card answer text-center h-100" v-on:click="answer.onSelect">
+        <div class="card-body">
+          <h5 class="card-title">{{ answer.answer }}</h5>
+          <h6 class="card-subtitle mb-2 text-muted" v-if="answer.extra">{{ answer.extra }}</h6>
+          <examples v-if="answer.examples" v-bind:examples="answer.examples"></examples>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="question-template">
+    <div class="question">
+      <h3 class="border-bottom text-muted fw-lighter">{{ question.title }}</h3>
+      <h2>{{ question.question }}</h2>
+      <p v-if="question.extra">{{ question.extra }}</p>
+      <div class="answers">
+        <div class="row">
+          <question-answer 
+            v-bind:key="answer.answer"
+            v-for="answer in question.answers"
+            v-bind:answer="answer"
+          ></question-answer>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="examples-template">
+    <div class="examples text-muted border-top fw-lighter">
+      <h6>Examples</h6>
+      <ul>
+        <li class="example" v-for="example in examples">{{ example }}</li>
+      </ul>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="score-card-template">
+    <div class="col-sm">
+      <div class="card score-card text-center text-white mb-3"
+        :class="{ 'bg-danger': severityHigh, 'bg-warning': severityMedium, 'bg-success': severityLow }">
+        <div class="card-header">{{ metric }}</div>
+        <div class="card-body">
+          <h5 class="card-title">{{ humanFriendlyScore }}</h5>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="score-modal-template">
+    <div class="modal modal-fade" tabindex="-1" id="score-modal" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{cvssVector}} <span class="badge rounded-pill"
+              :class="{ 'bg-danger': severityCritical, 'bg-danger': severityHigh, 'bg-warning': severityMedium, 'bg-success': severityLow }">{{ cvssScore }} ({{ severity }})</span></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <score-card 
+                v-for="(score, metric) in cvssMetrics" 
+                v-bind:metric="metric" 
+                v-bind:score="score"
+                v-bind:key="metric"></score-card>
+            </div>
+
+            <div class="bounty text-center">
+              <h2 class="display-6">💰 Suggested Bounty 💰</h2>
+              <h3 class="display-5">$3,500</h3>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.min.js"
+    integrity="sha384-cwVe6U8Tq7F/3JIj6xeDzOwuqeChcmRcdYqDGfoYmdAurw7L3f4dFHhEJKfxv96A"
+    crossorigin="anonymous"></script> -->
+    <script src="/js/cvsscalc30.js"></script>
+  <script src="/js/application.js"></script>
+</body>
+
+</html>
