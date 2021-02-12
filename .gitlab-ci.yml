@@ -4,7 +4,6 @@ workflow:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 .build_site:
-  extends: .node
   script:
     - bash build.sh
   artifacts:
