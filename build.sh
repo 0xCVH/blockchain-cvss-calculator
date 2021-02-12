@@ -2,7 +2,7 @@
 set -euo pipefail
 
 vuedev='<script src="https://cdn\.jsdelivr\.net/npm/vue@2/dist/vue.js"></script>'
-vueprod='<script src="https:/cdn\.jsdelivr\.net/npm/vue@2\.6\.12/dist/vue\.min\.js" integrity="sha384-cwVe6U8Tq7F/3JIj6xeDzOwuqeChcmRcdYqDGfoYmdAurw7L3f4dFHhEJKfxv96A" crossorigin="anonymous"></script>'
+vueprod='<script src="https://cdn\.jsdelivr\.net/npm/vue@2\.6\.12/dist/vue\.min\.js" integrity="sha384-cwVe6U8Tq7F/3JIj6xeDzOwuqeChcmRcdYqDGfoYmdAurw7L3f4dFHhEJKfxv96A" crossorigin="anonymous"></script>'
 
 echo " + Copying CSS files to public/"
 cp -R css public/
