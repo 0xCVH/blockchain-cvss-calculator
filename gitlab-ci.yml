@@ -1,0 +1,22 @@
+workflow:
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+.build_site:
+  extends: .node
+  script:
+    - bash build.sh
+  artifacts:
+    paths:
+      - public/
+
+build_site:
+  extends: .build_site
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+
+pages:
+  extends: .build_site
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
