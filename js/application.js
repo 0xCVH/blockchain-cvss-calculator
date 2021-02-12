@@ -109,36 +109,96 @@ var ScoreModal = Vue.component('score-modal', {
       severityCritical: false,
       severityHigh: false,
       severityMedium: false,
-      severityLow: false
+      severityLow: false,
+      bountyRanges: {
+        Critical: {
+          minScore: 9.0,
+          maxScore: 10.0,
+          minBounty: 10000,
+          maxBounty: 20000
+        },
+        High: {
+          minScore: 7.0,
+          maxScore: 8.9,
+          minBounty: 3000,
+          maxBounty: 10000
+        },
+        Medium: {
+          minScore: 4.0,
+          maxScore: 6.9,
+          minBounty: 500,
+          maxBounty: 1500
+        },
+        Low: {
+          minScore: 0.1,
+          maxScore: 3.9,
+          minBounty: 50,
+          maxBounty: 500
+        }
+      }
     }
   },
   mounted() {
-    this.cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
-    var score = CVSS.calculateCVSSFromVector(this.cvssVector);
-    this.cvssScore = score.baseMetricScore;
-    this.severity = score.baseSeverity;
-    switch (this.severity) {
-    case 'Critical':
-      this.severityCritical = true;
-      break;
-    case 'High':
-      this.severityHigh = true;
-      break;
-    case 'Medium':
-      this.severityMedium = true;
-      break;
-    case 'Low':
-    case 'None':
-      this.severityLow = true;
-    }
+    this.calculateCVSS();
+    this.calculateSuggestedBounty();
+    this.determineSeverity();
   },
   methods: {
+    calculateCVSS: function () {
+      this.cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
+      var score = CVSS.calculateCVSSFromVector(this.cvssVector);
+      this.cvssScore = score.baseMetricScore;
+      this.severity = score.baseSeverity;
+    },
+    determineSeverity: function () {
+      switch (this.severity) {
+        case 'Critical':
+          this.severityCritical = true;
+          break;
+        case 'High':
+          this.severityHigh = true;
+          break;
+        case 'Medium':
+          this.severityMedium = true;
+          break;
+        case 'Low':
+        case 'None':
+          this.severityLow = true;
+        }
+    },
+    calculateSuggestedBounty: function (score, minScore, maxScore, minBounty, maxBounty) {
+      range = this.bountyRanges[this.severity];
+      bounty = this.getBounty(this.cvssScore, range.minScore, range.maxScore, range.minBounty, range.maxBounty);
+      this.suggestedBounty = this.formatBounty(bounty);
+    },
     cvssMetricsToVector: function (metrics) {
       var vector = `${CVSS.CVSSVersionIdentifier}`
       for (const [metric, value] of Object.entries(metrics)) {
         vector += `/${metric}:${value}`
       }
       return vector;
+    },
+    // Logic for getBounty is borrowed from Shopify's bounty calculator. Thanks! ;)
+    getBounty: function (score, minScore, maxScore, minBounty, maxBounty) {
+      //Sets bounty for severity
+      bountyRange = maxBounty - minBounty;
+      //Sets score range for severity
+      scoreRange = maxScore - minScore;
+      //Sets score above lowest range
+      score = score - minScore;
+      //Sets score as a percentage of range
+      scorePercentage = score / scoreRange;
+      //Multiplies score percentage by bounty range to find percentage
+      bountyPercentage = scorePercentage * bountyRange;
+      //Adds pay percentage to minimum bounty amount
+      return bountyPercentage + minBounty;
+    },
+    formatBounty: function (bounty) {
+      var formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      });
+      return formatter.format(bounty);
     }
   }
 });
