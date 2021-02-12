@@ -11,5 +11,10 @@ cp -R js public/
 echo " + Copying index.html to public/"
 cp index.html public/
 echo " + Replacing development Vue script with production version"
-sed -i '' -e "s|${vuedev}|${vueprod}|g" public/index.html
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed -i '' -e "s|${vuedev}|${vueprod}|g" public/index.html
+else
+  sed -i -e "s|${vuedev}|${vueprod}|g" public/index.html
+fi
+
 echo " + Done!"
