@@ -572,7 +572,7 @@ var app = new Vue({
       this.$el.appendChild(modalInstance.$el);
       let modal = new bootstrap.Modal(modalInstance.$el);
       modalInstance.$el.addEventListener('hidden.bs.modal', (event) => {
-        window.location = "/";
+        window.location.hash = "";
       });
       modal.show();
     },
