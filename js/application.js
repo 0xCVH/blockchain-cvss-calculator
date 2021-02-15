@@ -216,6 +216,7 @@ var app = new Vue({
       I: undefined,
       A: undefined,
     },
+    current_route: window.location.hash,
     current_question: undefined,
     questions: {
       attack_vector_1: {
@@ -224,12 +225,12 @@ var app = new Vue({
         answers: [{
           answer: 'Yes',
           onSelect: () => {
-            this.app.showQuestion('attack_vector_2');
+            this.app.goToPage('attack_vector_2');
           }
         }, {
           answer: 'No',
           onSelect: () => {
-            this.app.showQuestion('attack_vector_3');
+            this.app.goToPage('attack_vector_3');
           }
         }]
       },
@@ -241,14 +242,14 @@ var app = new Vue({
           extra: 'Vulnerability is exploitable from across the internet.',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'N';
-            this.app.showQuestion('attack_complexity_1');
+            this.app.goToPage('attack_complexity_1');
           }
         }, {
           answer: 'No',
           extra: 'Vulnerability is exploitable across a limited physical or logical network distance.',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'A';
-            this.app.showQuestion('attack_complexity_1');
+            this.app.goToPage('attack_complexity_1');
           }
         }]
       },
@@ -260,14 +261,14 @@ var app = new Vue({
           extra: 'Attacker requires physical access to the vulnerable component.',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'L'
-            this.app.showQuestion('attack_complexity_1');
+            this.app.goToPage('attack_complexity_1');
           }
         }, {
           answer: 'No',
           extra: 'Attack is committed through a local application vulnerability, or the attacker is able to log in locally.',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'P';
-            this.app.showQuestion('attack_complexity_1');
+            this.app.goToPage('attack_complexity_1');
           }
         }]
       },
@@ -283,7 +284,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.AC = 'L';
-            this.app.showQuestion('privileges_required_1');
+            this.app.goToPage('privileges_required_1');
           }
         }, {
           answer: 'No',
@@ -296,7 +297,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.AC = 'H';
-            this.app.showQuestion('privileges_required_1');
+            this.app.goToPage('privileges_required_1');
           }
         }]
       },
@@ -306,7 +307,7 @@ var app = new Vue({
         answers: [{
           answer: 'Yes',
           onSelect: () => {
-            this.app.showQuestion('privileges_required_2');
+            this.app.goToPage('privileges_required_2');
           }
         }, {
           answer: 'No',
@@ -316,7 +317,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.PR = 'N';
-            this.app.showQuestion('user_interaction_1');
+            this.app.goToPage('user_interaction_1');
           }
         }]
       },
@@ -328,14 +329,14 @@ var app = new Vue({
           extra: 'Administrator or system level access required. Side note: high privilege users using a bug to sabotage their own projects is out of scope of our bug bounty program.',
           onSelect: () => {
             this.app.cvssMetrics.PR = 'H';
-            this.app.showQuestion('user_interaction_1');
+            this.app.goToPage('user_interaction_1');
           }
         }, {
           answer: 'No',
           extra: 'User level access required.',
           onSelect: () => {
             this.app.cvssMetrics.PR = 'L';
-            this.app.showQuestion('user_interaction_1');
+            this.app.goToPage('user_interaction_1');
           }
         }]
       },
@@ -350,7 +351,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.UI = 'R';
-            this.app.showQuestion('scope_1');
+            this.app.goToPage('scope_1');
           }
         }, {
           answer: 'No',
@@ -360,7 +361,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.UI = 'N';
-            this.app.showQuestion('scope_1');
+            this.app.goToPage('scope_1');
           }
         }]
       },
@@ -376,14 +377,14 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.S = 'C';
-            this.app.showQuestion('confidentiality_impact_1');
+            this.app.goToPage('confidentiality_impact_1');
           }
         }, {
           answer: 'No',
           extra: 'Impact is localized to the exploitable component.',
           onSelect: () => {
             this.app.cvssMetrics.S = 'U';
-            this.app.showQuestion('confidentiality_impact_1');
+            this.app.goToPage('confidentiality_impact_1');
           }
         }]
       },
@@ -393,14 +394,14 @@ var app = new Vue({
         answers: [{
           answer: 'Yes',
           onSelect: () => {
-            this.app.showQuestion('confidentiality_impact_2');
+            this.app.goToPage('confidentiality_impact_2');
           }
         }, {
           answer: 'No',
           extra: 'No information is disclosed.',
           onSelect: () => {
             this.app.cvssMetrics.C = "N";
-            this.app.showQuestion('integrity_impact_1');
+            this.app.goToPage('integrity_impact_1');
           }
         }]
       },
@@ -412,7 +413,7 @@ var app = new Vue({
           extra: 'All information is disclosed to attacker, or only some critical information is disclosed.',
           onSelect: () => {
             this.app.cvssMetrics.C = 'H';
-            this.app.showQuestion('integrity_impact_1');
+            this.app.goToPage('integrity_impact_1');
           }
         }, {
           answer: 'No',
@@ -425,7 +426,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.C = 'L';
-            this.app.showQuestion('integrity_impact_1');
+            this.app.goToPage('integrity_impact_1');
           }
         }]
       },
@@ -435,14 +436,14 @@ var app = new Vue({
         answers: [{
           answer: 'Yes',
           onSelect: () => {
-            this.app.showQuestion('integrity_impact_2');
+            this.app.goToPage('integrity_impact_2');
           }
         }, {
           answer: 'No',
           extra: 'No integrity loss.',
           onSelect: () => {
             this.app.cvssMetrics.I = 'N';
-            this.app.showQuestion('availability_impact_1');
+            this.app.goToPage('availability_impact_1');
           }
         }]
       },
@@ -459,14 +460,14 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.I = 'H';
-            this.app.showQuestion('availability_impact_1');
+            this.app.goToPage('availability_impact_1');
           }
         }, {
           answer: 'No',
           extra: 'Some information can be altered, and/or attacker does not have control over kind or degree.',
           onSelect: () => {
             this.app.cvssMetrics.I = 'L';
-            this.app.showQuestion('availability_impact_1');
+            this.app.goToPage('availability_impact_1');
           }
         }]
       },
@@ -476,7 +477,7 @@ var app = new Vue({
         answers: [{
           answer: 'Yes',
           onSelect: () => {
-            this.app.showQuestion('availability_impact_2');
+            this.app.goToPage('availability_impact_2');
           }
         }, {
           answer: 'No',
@@ -521,6 +522,20 @@ var app = new Vue({
     showQuestion: function (key) {
       this.current_question = this.questions[key];
     },
+    showPageFromFragment: function (fragment) {
+      if (fragment === "") {
+        this.showQuestion('attack_vector_1');
+      }
+      const key = fragment.substring(1);
+      if (key in this.questions) {
+        this.showQuestion(key);
+      } else {
+        this.showQuestion('attack_vector_1');
+      }
+    },
+    goToPage: function (key) {
+      window.location.hash = `#${key}`;
+    },
     showScore: function () {
       var modalInstance = new ScoreModal({
         propsData: { cvssMetrics: this.cvssMetrics }
@@ -535,6 +550,10 @@ var app = new Vue({
     }
   },
   created () {
-    this.showQuestion('attack_vector_1');
+    this.showPageFromFragment(this.current_route);
+    window.onhashchange = () => {
+      this.current_route = window.location.hash;
+      this.showPageFromFragment(this.current_route);
+    }
   }
 });
