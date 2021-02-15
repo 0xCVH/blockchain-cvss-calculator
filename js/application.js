@@ -20,6 +20,37 @@ Vue.component('examples', {
   template: '#examples-template'
 });
 
+Vue.component('skip-questions', {
+  data () {
+    return {
+      cvssVector: '',
+      validCvssVector: false,
+      formShown: false
+    }
+  },
+  template: '#skip-questions-template',
+  methods: {
+    showForm: function (e) {
+      e.preventDefault();
+      this.formShown = true;
+    },
+    validateCvssVector: function () {
+      if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
+        return true;
+      }
+      return false;
+    },
+    showScore: function () {
+      window.location.hash = `#${this.cvssVector}`;
+    }
+  },
+  watch: {
+    cvssVector: function () {
+      this.validCvssVector = this.validateCvssVector();
+    }
+  }
+});
+
 Vue.component('score-card', {
   props: ['metric', 'score'],
   template: '#score-card-template',

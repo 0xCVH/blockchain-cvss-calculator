@@ -16,6 +16,7 @@
   <main class="container">
     <div id="app">
       <question v-bind:question="current_question"></question>
+      <skip-questions></skip-questions>
     </div>
   </main>
 
@@ -45,6 +46,18 @@
           ></question-answer>
         </div>
       </div>
+    </div>
+  </script>
+
+  <script type="text/x-template" id="skip-questions-template">
+    <div class="skip-questions">
+      <a href="#" v-on:click="showForm" v-show="!formShown">Skip questions, I already have a CVSS vector</a>
+      <form v-show="formShown">
+        <div class="input-group input-group-lg">
+          <input type="text" class="form-control" v-model="cvssVector" placeholder="CVSS:3.0/AV..." aria-label="CVSS Vector" aria-describedby="button-submit-cvss-vector" required>
+          <button class="btn btn-outline-secondary" type="button" id="button-submit-cvss-vector" :disabled="!validCvssVector" v-on:click="showScore">Submit</button>
+        </div>
+      </form>
     </div>
   </script>
 

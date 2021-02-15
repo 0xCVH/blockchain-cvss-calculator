@@ -112,6 +112,17 @@ body {
     font-family: 'Source Sans 3',sans-serif;
 }
 
+a {
+    color: #6b4fbb;
+    text-decoration: none;
+    font-weight: 400;
+}
+
+a:hover {
+    color: #4b3589;
+    text-decoration: underline;
+}
+
 .question {
     margin-top: 100px;
     text-align: center;
@@ -141,6 +152,12 @@ body {
     text-align: left;
     margin-top: 30px;
     padding-top: 30px;
+}
+
+.skip-questions {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 18px;
 }
 
 .bounty {
