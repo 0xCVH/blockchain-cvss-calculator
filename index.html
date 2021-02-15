@@ -15,7 +15,9 @@
 <body>
   <main class="container">
     <div id="app">
-      <question v-bind:question="current_question"></question>
+      <transition name="slide-fade" mode="out-in">
+        <question v-bind:question="current_question" :key="current_question.question"></question>
+      </transition>
       <skip-questions></skip-questions>
     </div>
   </main>

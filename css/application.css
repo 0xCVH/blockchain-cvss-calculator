@@ -108,6 +108,18 @@
          url('WOFF/OTF/SourceSans3-BlackIt.otf.woff') format('woff');
 }
 
+slide-fade-enter-active {
+    transition: all .1s ease-in;
+}
+.slide-fade-leave-active {
+    transition: all .1s cubic-bezier(1.0, 0.3, 0.5, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+    /* .slide-fade-leave-active below version 2.1.8 */ {
+    transform: translateX(10px);
+    opacity: 0;
+}
+
 body {
     font-family: 'Source Sans 3',sans-serif;
 }
