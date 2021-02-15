@@ -99,17 +99,27 @@ Vue.component('score-card', {
 });
 
 var ScoreModal = Vue.component('score-modal', {
-  props: ['cvssMetrics'],
+  props: ['cvssVector'],
   template: '#score-modal-template',
   data () {
     return {
-      cvssVector: undefined,
+      cvssMetrics: {
+        AV: undefined,
+        AC: undefined,
+        PR: undefined,
+        UI: undefined,
+        S: undefined,
+        C: undefined,
+        I: undefined,
+        A: undefined,
+      },
       cvssScore: 0.0,
       severity: undefined,
       severityCritical: false,
       severityHigh: false,
       severityMedium: false,
       severityLow: false,
+      suggestedBounty: 0,
       bountyRanges: {
         Critical: {
           minScore: 9.0,
@@ -138,17 +148,29 @@ var ScoreModal = Vue.component('score-modal', {
       }
     }
   },
-  mounted() {
+  beforeMount() {
+    this.populateCvssMetricsFromVector(this.cvssVector);
     this.calculateCVSS();
     this.calculateSuggestedBounty();
     this.determineSeverity();
   },
   methods: {
     calculateCVSS: function () {
-      this.cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
       var score = CVSS.calculateCVSSFromVector(this.cvssVector);
       this.cvssScore = score.baseMetricScore;
       this.severity = score.baseSeverity;
+    },
+    populateCvssMetricsFromVector: function (vector) {
+      var metrics = vector.substring(CVSS.CVSSVersionIdentifier.length).split("/");
+      for (const m of metrics) {
+        if (m === "") {
+          continue;
+        }
+        var metricAndScore = m.split(':');
+        if (metricAndScore[0] in this.cvssMetrics) {
+          this.cvssMetrics[metricAndScore[0]] = metricAndScore[1];
+        }
+      }
     },
     determineSeverity: function () {
       switch (this.severity) {
@@ -170,13 +192,6 @@ var ScoreModal = Vue.component('score-modal', {
       range = this.bountyRanges[this.severity];
       bounty = this.getBounty(this.cvssScore, range.minScore, range.maxScore, range.minBounty, range.maxBounty);
       this.suggestedBounty = this.formatBounty(bounty);
-    },
-    cvssMetricsToVector: function (metrics) {
-      var vector = `${CVSS.CVSSVersionIdentifier}`
-      for (const [metric, value] of Object.entries(metrics)) {
-        vector += `/${metric}:${value}`
-      }
-      return vector;
     },
     // Logic for getBounty is borrowed from Shopify's bounty calculator. Thanks! ;)
     getBounty: function (score, minScore, maxScore, minBounty, maxBounty) {
@@ -217,7 +232,7 @@ var app = new Vue({
       A: undefined,
     },
     current_route: window.location.hash,
-    current_question: undefined,
+    current_question: 'attack_vector_1',
     questions: {
       attack_vector_1: {
         title: 'Attack Vector',
@@ -484,7 +499,7 @@ var app = new Vue({
           extra: 'No Availability impact.',
           onSelect: () => {
             this.app.cvssMetrics.A = 'N';
-            this.app.showScore();
+            this.app.goToScore();
           }
         }]
       },
@@ -501,7 +516,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.A = 'H';
-            this.app.showScore();
+            this.app.goToScore();
           }
         }, {
           answer: 'No',
@@ -512,7 +527,7 @@ var app = new Vue({
           ],
           onSelect: () => {
             this.app.cvssMetrics.A = 'L';
-            this.app.showScore();
+            this.app.goToScore();
           }
         }]
       }
@@ -525,8 +540,16 @@ var app = new Vue({
     showPageFromFragment: function (fragment) {
       if (fragment === "") {
         this.showQuestion('attack_vector_1');
+        return;
       }
       const key = fragment.substring(1);
+      if (CVSS.vectorStringRegex_30.test(key)) {
+        this.showQuestion('attack_vector_1');
+        this.cvssVector = key;
+        this.populateCvssMetricsFromVector(this.cvssVector);
+        this.showScore();
+        return;
+      }
       if (key in this.questions) {
         this.showQuestion(key);
       } else {
@@ -536,20 +559,44 @@ var app = new Vue({
     goToPage: function (key) {
       window.location.hash = `#${key}`;
     },
+    goToScore: function () {
+      const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
+      window.location.hash = `#${cvssVector}`;
+    },
     showScore: function () {
-      var modalInstance = new ScoreModal({
-        propsData: { cvssMetrics: this.cvssMetrics }
+      const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
+      let modalInstance = new ScoreModal({
+        propsData: { cvssVector: cvssVector }
       });
       modalInstance.$mount();
       this.$el.appendChild(modalInstance.$el);
-      var modal = new bootstrap.Modal(modalInstance.$el);
+      let modal = new bootstrap.Modal(modalInstance.$el);
       modalInstance.$el.addEventListener('hidden.bs.modal', (event) => {
-        window.location.reload();
+        window.location = "/";
       });
       modal.show();
+    },
+    cvssMetricsToVector: function (metrics) {
+      var vector = `${CVSS.CVSSVersionIdentifier}`
+      for (const [metric, value] of Object.entries(metrics)) {
+        vector += `/${metric}:${value}`
+      }
+      return vector;
+    },
+    populateCvssMetricsFromVector: function (vector) {
+      var metrics = vector.substring(CVSS.CVSSVersionIdentifier.length).split("/");
+      for (const m of metrics) {
+        if (m === "") {
+          continue;
+        }
+        var metricAndScore = m.split(':');
+        if (metricAndScore[0] in this.cvssMetrics) {
+          this.cvssMetrics[metricAndScore[0]] = metricAndScore[1];
+        }
+      }
     }
   },
-  created () {
+  mounted () {
     this.showPageFromFragment(this.current_route);
     window.onhashchange = () => {
       this.current_route = window.location.hash;
