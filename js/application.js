@@ -1,4 +1,4 @@
-Vue.component('question-answer', {
+Vue.component('QuestionAnswer', {
   props: {
     answer: {
       type: Object
@@ -10,17 +10,17 @@ Vue.component('question-answer', {
   template: '#answer-template'
 });
 
-Vue.component('question', {
+Vue.component('Question', {
   props: ['question'],
   template: '#question-template'
 });
 
-Vue.component('examples', {
+Vue.component('Examples', {
   props: ['examples'],
   template: '#examples-template'
 });
 
-Vue.component('skip-questions', {
+Vue.component('skipquestions', {
   data () {
     return {
       cvssVector: '',
@@ -55,7 +55,7 @@ Vue.component('skip-questions', {
   }
 });
 
-Vue.component('score-card', {
+Vue.component('ScoreCard', {
   props: ['metric', 'score'],
   template: '#score-card-template',
   data () {
@@ -133,7 +133,7 @@ Vue.component('score-card', {
   }
 });
 
-var ScoreModal = Vue.component('score-modal', {
+var ScoreModal = Vue.component('ScoreModal', {
   props: ['cvssVector'],
   template: '#score-modal-template',
   data () {

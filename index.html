@@ -24,9 +24,9 @@
       </div>
 
       <transition name="slide-fade" mode="out-in">
-        <question v-bind:question="current_question" :key="current_question.question"></question>
+        <Question v-bind:question="current_question" :key="current_question.question"></Question>
       </transition>
-      <skip-questions></skip-questions>
+      <SkipQuestions />
     </div>
   </main>
 
@@ -36,7 +36,7 @@
         <div class="card-body">
           <h5 class="card-title">{{ answer.answer }}</h5>
           <h6 class="card-subtitle mb-2 text-muted" v-if="answer.extra">{{ answer.extra }}</h6>
-          <examples v-if="answer.examples" v-bind:examples="answer.examples"></examples>
+          <Examples v-if="answer.examples" v-bind:examples="answer.examples"></Examples>
         </div>
       </div>
     </div>
@@ -49,11 +49,11 @@
       <p v-if="question.extra">{{ question.extra }}</p>
       <div class="answers">
         <div class="row">
-          <question-answer 
+          <QuestionAnswer 
             v-bind:key="answer.answer"
             v-for="answer in question.answers"
             v-bind:answer="answer"
-          ></question-answer>
+          ></QuestionAnswer>
         </div>
       </div>
     </div>
@@ -103,11 +103,11 @@
           </div>
           <div class="modal-body">
             <div class="row">
-              <score-card 
+              <ScoreCard 
                 v-for="(score, metric) in cvssMetrics" 
                 v-bind:metric="metric" 
                 v-bind:score="score"
-                v-bind:key="metric"></score-card>
+                v-bind:key="metric"></ScoreCard>
             </div>
 
             <div class="bounty text-center">
