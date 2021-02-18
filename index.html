@@ -9,12 +9,19 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
   <link href="css/application.css" rel="stylesheet">
-  <meta name="theme-color" content="#7952b3">
+  <meta name="theme-color" content="#9b51e0">
 </head>
 
 <body>
   <main class="container">
     <div id="app">
+      <div class="bg-light p-5 rounded">
+        <h1>GitLab CVSS Calculator</h1>
+        <p class="lead">This calculator is used to calculate bounties for vulnerabilities reported to GitLab's <a href="https://hackerone.com/gitlab">Bug Bounty Program on HackerOne</a>. 
+          Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.0/specification-document">CVSS</a>) 
+          which is used to calculate a suggested bug bounty based on the impact.</p>
+      </div>
+
       <transition name="slide-fade" mode="out-in">
         <question v-bind:question="current_question" :key="current_question.question"></question>
       </transition>
@@ -24,7 +31,7 @@
 
   <script type="text/x-template" id="answer-template">
     <div class="col-sm-6">
-      <div class="card answer text-center h-100" v-on:click="answer.onSelect">
+      <div class="card answer text-center h-100 bg-light" v-on:click="answer.onSelect">
         <div class="card-body">
           <h5 class="card-title">{{ answer.answer }}</h5>
           <h6 class="card-subtitle mb-2 text-muted" v-if="answer.extra">{{ answer.extra }}</h6>
@@ -53,7 +60,7 @@
 
   <script type="text/x-template" id="skip-questions-template">
     <div class="skip-questions">
-      <a href="#" v-on:click="showForm" v-show="!formShown">Skip questions, I already have a CVSS vector</a>
+      <a href="#" v-on:click="showForm" v-show="!formShown">Skip questions, I already have a CVSS vector.</a>
       <form v-show="formShown">
         <div class="input-group input-group-lg">
           <input type="text" class="form-control" v-model="cvssVector" placeholder="CVSS vector..." aria-label="CVSS Vector" aria-describedby="button-submit-cvss-vector" required>
@@ -108,6 +115,8 @@
             </div>
           </div>
           <div class="modal-footer">
+            <button type="button" class="btn btn-primary" v-on:click="copyURLToClipboard" ref="btnCopyUrl">Copy URL to clipboard</button>
+            <button type="button" class="btn btn-primary" v-on:click="copyVectorToClipboard" ref="btnCopyVector">Copy vector to clipboard</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>

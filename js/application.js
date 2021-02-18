@@ -249,6 +249,24 @@ var ScoreModal = Vue.component('score-modal', {
         currency: 'USD'
       });
       return formatter.format(bounty);
+    },
+    copyURLToClipboard: function (e) {
+      e.preventDefault();
+      this.copyToClipboard(document.location);
+      this.$refs.btnCopyUrl.innerText = "Copied URL to clipboard!";
+    },
+    copyVectorToClipboard: function (e) {
+      e.preventDefault();
+      this.copyToClipboard(this.cvssVector);
+      this.$refs.btnCopyVector.innerText = "Copied vector to clipboard!";
+    },
+    copyToClipboard: function (text) {
+      el = document.createElement('input');
+      el.value = text;
+      this.$el.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      this.$el.removeChild(el);
     }
   }
 });

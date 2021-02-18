@@ -135,6 +135,21 @@ a:hover {
     text-decoration: underline;
 }
 
+.btn-primary {
+    background-color: #9b51e0;
+    color: #fff;
+    border-color: #9b51e0;
+}
+
+.btn-primary:hover {
+    background-color: #9c3ff2;
+    border-color: #9c3ff2;
+}
+
+.bg-light {
+    background: linear-gradient(180deg, #F5F5F5 0%, rgba(245, 245, 245, 0) 100%);
+}
+
 .question {
     margin-top: 100px;
     text-align: center;
