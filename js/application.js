@@ -1,3 +1,8 @@
+/**
+ * QuestionAnswer represents the answers to a question.
+ *
+ * QuestionAnwer is used within the Question template to render the possible answers to a question.
+ */
 Vue.component('QuestionAnswer', {
   props: {
     answer: {
@@ -10,16 +15,29 @@ Vue.component('QuestionAnswer', {
   template: '#answer-template'
 });
 
+/**
+ * Question represents a question.
+ */
 Vue.component('Question', {
   props: ['question'],
   template: '#question-template'
 });
 
+/**
+ * Examples represents the examples that answers can have.
+ *
+ * Examples is used within the Answer template.
+ */
 Vue.component('Examples', {
   props: ['examples'],
   template: '#examples-template'
 });
 
+/**
+ * SkipQuestions controls the feature for skipping questions by entering a CVSS token.
+ *
+ * The component is a clickable link that will present an input field on click.
+ */
 Vue.component('skipquestions', {
   data () {
     return {
@@ -30,10 +48,21 @@ Vue.component('skipquestions', {
   },
   template: '#skip-questions-template',
   methods: {
+    /**
+     * Shows the CVSS vector input form and hides the link.
+     *
+     * @param {Object} e The click event.
+     */
     showForm: function (e) {
       e.preventDefault();
       this.formShown = true;
     },
+    /**
+     * Validates the CVSS vector entered into the form and enables the submit button if valid.
+     *
+     * Accepts CVSS 3.0 vector strings with and without the version identifier. If the version
+     * identifier is missing, it will be automatically prepended to the entered CVSS vector.
+     */
     validateCvssVector: function () {
       if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
         return true;
@@ -44,17 +73,27 @@ Vue.component('skipquestions', {
       }
       return false;
     },
+    /**
+     * Redirects the browser to the CVSS score page by altering the location hash/fragement to
+     * trigger the score route.
+     */
     showScore: function () {
       window.location.hash = `#${this.cvssVector}`;
     }
   },
   watch: {
+    /**
+     * Validate the CVSS vector every time it's changed.
+     */
     cvssVector: function () {
       this.validCvssVector = this.validateCvssVector();
     }
   }
 });
 
+/**
+ * ScoreCard represents a single CVSS metric which is rendered in ScoreModal for each metric.
+ */
 Vue.component('ScoreCard', {
   props: ['metric', 'score'],
   template: '#score-card-template',
@@ -67,6 +106,9 @@ Vue.component('ScoreCard', {
     }
   },
   methods: {
+    /**
+     * Determines the severity (high, medium, low) of the CVSS metric.
+     */
     determineSeverity: function () {
       if (this.metric === 'AV' && this.score === 'N') { this.severityHigh = true }
       else if (this.metric === 'AV' && this.score === 'A') { this.severityMedium = true }
@@ -83,6 +125,9 @@ Vue.component('ScoreCard', {
       else if (this.metric === 'A' && this.score === 'L')  { this.severityMedium = true }
       else { this.severityLow = true }
     },
+    /**
+     * Translates the shorthand metric scores to a more human friendly representation.
+     */
     scoreToHumanFriendly: function () {
       humanScores = {
         AV: {
@@ -133,6 +178,9 @@ Vue.component('ScoreCard', {
   }
 });
 
+/**
+ * ScoreModal represents the final modal screen which presents the CVSS score and suggested bounty.
+ */
 var ScoreModal = Vue.component('ScoreModal', {
   props: ['cvssVector'],
   template: '#score-modal-template',
@@ -190,11 +238,19 @@ var ScoreModal = Vue.component('ScoreModal', {
     this.determineSeverity();
   },
   methods: {
+    /**
+     * Calculates the CVSS score from the metrics.
+     */
     calculateCVSS: function () {
       var score = CVSS.calculateCVSSFromVector(this.cvssVector);
       this.cvssScore = score.baseMetricScore;
       this.severity = score.baseSeverity;
     },
+    /**
+     * Parses the CVSS vector string and populates the metrics with correct values.
+     *
+     * @param {string} vector The CVSS vector string
+     */
     populateCvssMetricsFromVector: function (vector) {
       var metrics = vector.substring(CVSS.CVSSVersionIdentifier.length).split("/");
       for (const m of metrics) {
@@ -207,6 +263,9 @@ var ScoreModal = Vue.component('ScoreModal', {
         }
       }
     },
+    /**
+     * Determines the severity (critical, high, medium, low) of the CVSS score.
+     */
     determineSeverity: function () {
       switch (this.severity) {
         case 'Critical':
@@ -223,12 +282,33 @@ var ScoreModal = Vue.component('ScoreModal', {
           this.severityLow = true;
         }
     },
+    /**
+     * Calculates the suggested bounty based on the CVSS score and populates the suggestBounty data
+     * attribute with the number with pretty formatting.
+     *
+     * @param {number} score     The CVSS score.
+     * @param {number} minScore  The minimum score.
+     * @param {number} maxScore  The maximum score.
+     * @param {number} minBounty The minimum bounty.
+     * @param {number} maxBounty The maximum bounty.
+     */
     calculateSuggestedBounty: function (score, minScore, maxScore, minBounty, maxBounty) {
       range = this.bountyRanges[this.severity];
       bounty = this.getBounty(this.cvssScore, range.minScore, range.maxScore, range.minBounty, range.maxBounty);
       this.suggestedBounty = this.formatBounty(bounty);
     },
-    // Logic for getBounty is borrowed from Shopify's bounty calculator. Thanks! ;)
+    /**
+     * Calculates the suggested bounty based on the CVSS score.
+     *
+     * Logic for this method is borrowed from Shopify's bounty calculator. Thanks! ;)
+     *
+     * @param {number} score     The CVSS score.
+     * @param {number} minScore  The minimum score.
+     * @param {number} maxScore  The maximum score.
+     * @param {number} minBounty The minimum bounty.
+     * @param {number} maxBounty The maximum bounty.
+     * @return {number} Suggested bounty.
+     */
     getBounty: function (score, minScore, maxScore, minBounty, maxBounty) {
       //Sets bounty for severity
       bountyRange = maxBounty - minBounty;
@@ -243,6 +323,12 @@ var ScoreModal = Vue.component('ScoreModal', {
       //Adds pay percentage to minimum bounty amount
       return bountyPercentage + minBounty;
     },
+    /**
+     * Formats the bounty as USD currency.
+     *
+     * @param {number} bounty amount.
+     * @return {string} Formatted bounty amount.
+     */
     formatBounty: function (bounty) {
       var formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -250,16 +336,34 @@ var ScoreModal = Vue.component('ScoreModal', {
       });
       return formatter.format(bounty);
     },
+    /**
+     * Copies the score URL to the clipboard.
+     *
+     * @param {Object} e The click event.
+     */
     copyURLToClipboard: function (e) {
       e.preventDefault();
       this.copyToClipboard(document.location);
       this.$refs.btnCopyUrl.innerText = "Copied URL to clipboard!";
     },
+    /**
+     * Copies the CVSS vector to the clipboard.
+     *
+     * @param {Object} e The click event.
+     */
     copyVectorToClipboard: function (e) {
       e.preventDefault();
       this.copyToClipboard(this.cvssVector);
       this.$refs.btnCopyVector.innerText = "Copied vector to clipboard!";
     },
+    /**
+     * Copies text the clipboard.
+     *
+     * Temporarily adds an input element with the given text to the DOM in order to select and copy
+     * the content, and is then immediately removed.
+     *
+     * @param {string} text The text to copy to the clipboard.
+     */
     copyToClipboard: function (text) {
       el = document.createElement('input');
       el.value = text;
@@ -587,9 +691,21 @@ var app = new Vue({
     }
   },
   methods: {
+    /**
+     * Renders a question with the given key.
+     *
+     * @param {string} key The question's key.
+     */
     showQuestion: function (key) {
       this.current_question = this.questions[key];
     },
+    /**
+     * Determines which page to display based on the page hash / fragment.
+     *
+     * If the fragment is unknown or empty, the first attack vector question is rendered.
+     *
+     * @param {string} fragment The page fragment / hash without the leading '#'
+     */
     showPageFromFragment: function (fragment) {
       if (fragment === "") {
         this.showQuestion('attack_vector_1');
@@ -609,13 +725,26 @@ var app = new Vue({
         this.showQuestion('attack_vector_1');
       }
     },
-    goToPage: function (key) {
-      window.location.hash = `#${key}`;
+    /**
+     * Modifies the document location to point at the given page fragment / hash to trigger the
+     * routing.
+     *
+     * @param {string} fragment The page fragement / hash without the leading '#'
+     */
+    goToPage: function (fragment) {
+      window.location.hash = `#${fragment}`;
     },
+    /**
+     * Modifies the document location to point at the page fragment / hash to show the score page
+     * for the current CVSS metrics.
+     */
     goToScore: function () {
       const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
       window.location.hash = `#${cvssVector}`;
     },
+    /**
+     * Renders the CVSS score page / modal with the current CVSS metrics.
+     */
     showScore: function () {
       const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
       let modalInstance = new ScoreModal({
@@ -629,6 +758,12 @@ var app = new Vue({
       });
       modal.show();
     },
+    /**
+     * Convers the given metrics object to a CVSS 3.0 vector string.
+     *
+     * @param {Object} metrics
+     * @return {string} The CVSS 3.0 vector string.
+     */
     cvssMetricsToVector: function (metrics) {
       var vector = `${CVSS.CVSSVersionIdentifier}`
       for (const [metric, value] of Object.entries(metrics)) {
@@ -636,6 +771,11 @@ var app = new Vue({
       }
       return vector;
     },
+    /**
+     * Parses the given CVSS vector string and populates the CVSS metrics object with correct values.
+     *
+     * @param {string} vector The CVSS 3.0 vector string
+     */
     populateCvssMetricsFromVector: function (vector) {
       var metrics = vector.substring(CVSS.CVSSVersionIdentifier.length).split("/");
       for (const m of metrics) {
