@@ -38,6 +38,10 @@ Vue.component('skip-questions', {
       if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
         return true;
       }
+      if (CVSS.vectorStringRegex_30.test(`${CVSS.CVSSVersionIdentifier}/${this.cvssVector}`)) {
+        this.cvssVector = `${CVSS.CVSSVersionIdentifier}/${this.cvssVector}`;
+        return true;
+      }
       return false;
     },
     showScore: function () {
