@@ -330,11 +330,26 @@ var ScoreModal = Vue.component('ScoreModal', {
      * @return {string} Formatted bounty amount.
      */
     formatBounty: function (bounty) {
+      bounty = this.roundUp(bounty, 10);
       var formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD'
       });
       return formatter.format(bounty);
+    },
+    /**
+     * Rounds a number up to the nearest whole number.
+     *
+     * @param {Number|String} num Number to round.
+     * @param {Number} precision Whole number to round to (10, 100, 1000).
+     * @return {Number}
+     */
+    roundUp: function (num, precision) {
+      num = parseFloat(num);
+      if (!precision) {
+        return num;
+      }
+      return (Math.ceil(num / precision) * precision);
     },
     /**
      * Copies the score URL to the clipboard.
