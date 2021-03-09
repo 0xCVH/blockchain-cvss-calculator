@@ -18,8 +18,8 @@
     <div id="app">
       <div class="bg-light p-5 rounded">
         <h1>GitLab CVSS Calculator</h1>
-        <p class="lead">This calculator is used to calculate bounties for vulnerabilities reported to GitLab's <a href="https://hackerone.com/gitlab">Bug Bounty Program on HackerOne</a>. 
-          Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.0/specification-document">CVSS</a>) 
+        <p class="lead">This calculator is used to calculate bounties for vulnerabilities reported to GitLab's <a href="https://hackerone.com/gitlab">Bug Bounty Program on HackerOne</a>.
+          Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.0/specification-document">CVSS</a>)
           which is used to calculate a suggested bug bounty based on the impact.</p>
       </div>
 
@@ -49,7 +49,7 @@
       <p v-if="question.extra">{{ question.extra }}</p>
       <div class="answers">
         <div class="row">
-          <QuestionAnswer 
+          <QuestionAnswer
             v-bind:key="answer.answer"
             v-for="answer in question.answers"
             v-bind:answer="answer"
@@ -82,7 +82,7 @@
 
   <script type="text/x-template" id="score-card-template">
     <div class="col-sm">
-      <div class="card score-card text-center text-white mb-3"
+      <div class="card score-card text-center text-white mb-3" ref="card" data-bs-toggle="popover"
         :class="{ 'bg-danger': severityHigh, 'bg-warning': severityMedium, 'bg-success': severityLow }">
         <div class="card-header">{{ metric }}</div>
         <div class="card-body">
@@ -103,9 +103,9 @@
           </div>
           <div class="modal-body">
             <div class="row">
-              <ScoreCard 
-                v-for="(score, metric) in cvssMetrics" 
-                v-bind:metric="metric" 
+              <ScoreCard
+                v-for="(score, metric) in cvssMetrics"
+                v-bind:metric="metric"
                 v-bind:score="score"
                 v-bind:key="metric"></ScoreCard>
             </div>

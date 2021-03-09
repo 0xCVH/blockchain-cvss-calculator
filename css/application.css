@@ -170,7 +170,7 @@ a:hover {
 }
 
 .answer { transition: all .1s ease-in-out; }
-.answer:hover { 
+.answer:hover {
     transform: scale(1.02);
     border-color: #e14329;
 }
@@ -190,4 +190,8 @@ a:hover {
 .bounty {
     margin-top: 50px;
     margin-bottom: 50px;
+}
+
+.score-card {
+    cursor: help;
 }

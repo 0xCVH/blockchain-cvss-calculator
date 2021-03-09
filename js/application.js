@@ -102,34 +102,59 @@ Vue.component('ScoreCard', {
       severityHigh: false,
       severityMedium: false,
       severityLow: false,
-      humanFriendlyScore: undefined
-    }
-  },
-  methods: {
-    /**
-     * Determines the severity (high, medium, low) of the CVSS metric.
-     */
-    determineSeverity: function () {
-      if (this.metric === 'AV' && this.score === 'N') { this.severityHigh = true }
-      else if (this.metric === 'AV' && this.score === 'A') { this.severityMedium = true }
-      else if (this.metric === 'AC' && this.score === 'L') { this.severityHigh = true }
-      else if (this.metric === 'UI' && this.score === 'N') { this.severityHigh = true }
-      else if (this.metric === 'PR' && this.score === 'N') { this.severityHigh = true }
-      else if (this.metric === 'PR' && this.score === 'L') { this.severityMedium = true }
-      else if (this.metric === 'S' && this.score === 'C')  { this.severityHigh = true }
-      else if (this.metric === 'C' && this.score === 'H')  { this.severityHigh = true }
-      else if (this.metric === 'C' && this.score === 'L')  { this.severityMedium = true }
-      else if (this.metric === 'I' && this.score === 'H')  { this.severityHigh = true }
-      else if (this.metric === 'I' && this.score === 'L')  { this.severityMedium = true }
-      else if (this.metric === 'A' && this.score === 'H')  { this.severityHigh = true }
-      else if (this.metric === 'A' && this.score === 'L')  { this.severityMedium = true }
-      else { this.severityLow = true }
-    },
-    /**
-     * Translates the shorthand metric scores to a more human friendly representation.
-     */
-    scoreToHumanFriendly: function () {
-      humanScores = {
+      humanFriendlyScore: undefined,
+      tooltip: null,
+      humanMetrics: {
+        AV: 'Attack Vector',
+        AC: 'Attack Complexity',
+        PR: 'Privileges Required',
+        UI: 'User Interaction',
+        S: 'State',
+        C: 'Confidentiality',
+        I: 'Integrity',
+        A: 'Availability',
+      },
+      metricExplanations: {
+        AV: {
+          N: 'The vulnerable component is bound to the network stack and the set of possible attackers extends beyond the other options, up to and including the entire Internet. Such a vulnerability is often termed “remotely exploitable” and can be thought of as an attack being exploitable at the protocol level one or more network hops away (e.g., across one or more routers). An example of a network attack is an attacker causing a denial of service (DoS) by sending a specially crafted TCP packet across a wide area network (e.g., CVE‑2004‑0230).',
+          A: 'The vulnerable component is bound to the network stack, but the attack is limited at the protocol level to a logically adjacent topology. This can mean an attack must be launched from the same shared physical (e.g., Bluetooth or IEEE 802.11) or logical (e.g., local IP subnet) network, or from within a secure or otherwise limited administrative domain (e.g., MPLS, secure VPN to an administrative network zone). One example of an Adjacent attack would be an ARP (IPv4) or neighbor discovery (IPv6) flood leading to a denial of service on the local LAN segment (e.g., CVE‑2013‑6014).',
+          L: 'The vulnerable component is not bound to the network stack and the attacker’s path is via read/write/execute capabilities. Either: <ul><li>the attacker exploits the vulnerability by accessing the target system locally (e.g., keyboard, console), or remotely (e.g., SSH); or</li><li>the attacker relies on User Interaction by another person to perform actions required to exploit the vulnerability (e.g., using social engineering techniques to trick a legitimate user into opening a malicious document).</li></ul>',
+          P: 'The attack requires the attacker to physically touch or manipulate the vulnerable component. Physical interaction may be brief (e.g., evil maid attack) or persistent. An example of such an attack is a cold boot attack in which an attacker gains access to disk encryption keys after physically accessing the target system. Other examples include peripheral attacks via FireWire/USB Direct Memory Access (DMA).',
+        },
+        AC: {
+          L: 'Specialized access conditions or extenuating circumstances do not exist. An attacker can expect repeatable success when attacking the vulnerable component.',
+          H: `A successful attack depends on conditions beyond the attacker's control. That is, a successful attack cannot be accomplished at will, but requires the attacker to invest in some measurable amount of effort in preparation or execution against the vulnerable component before a successful attack can be expected. For example, a successful attack may depend on an attacker overcoming any of the following conditions: <ul><li>The attacker must gather knowledge about the environment in which the vulnerable target/component exists. For example, a requirement to collect details on target configuration settings, sequence numbers, or shared secrets.</li><li>The attacker must prepare the target environment to improve exploit reliability. For example, repeated exploitation to win a race condition, or overcoming advanced exploit mitigation techniques.</li><li>The attacker must inject themselves into the logical network path between the target and the resource requested by the victim in order to read and/or modify network communications (e.g., a man in the middle attack).</li></ul>`,
+        },
+        PR: {
+          N: 'The attacker is unauthorized prior to attack, and therefore does not require any access to settings or files of the the vulnerable system to carry out an attack.',
+          L: 'The attacker requires privileges that provide basic user capabilities that could normally affect only settings and files owned by a user. Alternatively, an attacker with Low privileges has the ability to access only non-sensitive resources.',
+          H: 'The attacker requires privileges that provide significant (e.g., administrative) control over the vulnerable component allowing access to component-wide settings and files.',
+        },
+        UI: {
+          N: 'The vulnerable system can be exploited without interaction from any user.',
+          R: 'Successful exploitation of this vulnerability requires a user to take some action before the vulnerability can be exploited. For example, a successful exploit may only be possible during the installation of an application by a system administrator.',
+        },
+        S: {
+          U: 'An exploited vulnerability can only affect resources managed by the same security authority. In this case, the vulnerable component and the impacted component are either the same, or both are managed by the same security authority.',
+          C: 'An exploited vulnerability can affect resources beyond the security scope managed by the security authority of the vulnerable component. In this case, the vulnerable component and the impacted component are different and managed by different security authorities.',
+        },
+        C: {
+          H: `There is a total loss of confidentiality, resulting in all resources within the impacted component being divulged to the attacker. Alternatively, access to only some restricted information is obtained, but the disclosed information presents a direct, serious impact. For example, an attacker steals the administrator's password, or private encryption keys of a web server.`,
+          L: 'There is some loss of confidentiality. Access to some restricted information is obtained, but the attacker does not have control over what information is obtained, or the amount or kind of loss is limited. The information disclosure does not cause a direct, serious loss to the impacted component.',
+          N: 'There is no loss of confidentiality within the impacted component.',
+        },
+        I: {
+          H: 'There is a total loss of integrity, or a complete loss of protection. For example, the attacker is able to modify any/all files protected by the impacted component. Alternatively, only some files can be modified, but malicious modification would present a direct, serious consequence to the impacted component.',
+          L: 'Modification of data is possible, but the attacker does not have control over the consequence of a modification, or the amount of modification is limited. The data modification does not have a direct, serious impact on the impacted component.',
+          N: 'There is no loss of integrity within the impacted component.',
+        },
+        A: {
+          H: 'There is a total loss of availability, resulting in the attacker being able to fully deny access to resources in the impacted component; this loss is either sustained (while the attacker continues to deliver the attack) or persistent (the condition persists even after the attack has completed). Alternatively, the attacker has the ability to deny some availability, but the loss of availability presents a direct, serious consequence to the impacted component (e.g., the attacker cannot disrupt existing connections, but can prevent new connections; the attacker can repeatedly exploit a vulnerability that, in each instance of a successful attack, leaks a only small amount of memory, but after repeated exploitation causes a service to become completely unavailable).',
+          L: 'Performance is reduced or there are interruptions in resource availability. Even if repeated exploitation of the vulnerability is possible, the attacker does not have the ability to completely deny service to legitimate users. The resources in the impacted component are either partially available all of the time, or fully available only some of the time, but overall there is no direct, serious consequence to the impacted component.',
+          N: 'There is no impact to availability within the impacted component.',
+        },
+      },
+      humanScores: {
         AV: {
           N: 'Network',
           A: 'Adjecent',
@@ -168,13 +193,45 @@ Vue.component('ScoreCard', {
           L: 'Low',
           H: 'High'
         }
-      }
-      this.humanFriendlyScore = humanScores[this.metric][this.score];
+      },
+    }
+  },
+  methods: {
+    /**
+     * Determines the severity (high, medium, low) of the CVSS metric.
+     */
+    determineSeverity: function () {
+      if (this.metric === 'AV' && this.score === 'N') { this.severityHigh = true }
+      else if (this.metric === 'AV' && this.score === 'A') { this.severityMedium = true }
+      else if (this.metric === 'AC' && this.score === 'L') { this.severityHigh = true }
+      else if (this.metric === 'UI' && this.score === 'N') { this.severityHigh = true }
+      else if (this.metric === 'PR' && this.score === 'N') { this.severityHigh = true }
+      else if (this.metric === 'PR' && this.score === 'L') { this.severityMedium = true }
+      else if (this.metric === 'S' && this.score === 'C')  { this.severityHigh = true }
+      else if (this.metric === 'C' && this.score === 'H')  { this.severityHigh = true }
+      else if (this.metric === 'C' && this.score === 'L')  { this.severityMedium = true }
+      else if (this.metric === 'I' && this.score === 'H')  { this.severityHigh = true }
+      else if (this.metric === 'I' && this.score === 'L')  { this.severityMedium = true }
+      else if (this.metric === 'A' && this.score === 'H')  { this.severityHigh = true }
+      else if (this.metric === 'A' && this.score === 'L')  { this.severityMedium = true }
+      else { this.severityLow = true }
+    },
+    /**
+     * Translates the shorthand metric scores to a more human friendly representation.
+     */
+    scoreToHumanFriendly: function () {
+      this.humanFriendlyScore = this.humanScores[this.metric][this.score];
     }
   },
   mounted() {
     this.determineSeverity();
     this.scoreToHumanFriendly();
+    this.tooltip = new bootstrap.Popover(this.$refs.card, {
+      title: this.humanMetrics[this.metric],
+      content: this.metricExplanations[this.metric][this.score],
+      placement: 'bottom',
+      html: true,
+    });
   }
 });
 
