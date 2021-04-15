@@ -98,7 +98,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">{{cvssVector}} <span class="badge rounded-pill"
-              :class="{ 'bg-danger': severityCritical, 'bg-danger': severityHigh, 'bg-warning': severityMedium, 'bg-success': severityLow }">{{ cvssScore }} ({{ severity }})</span></h5>
+              :class="{ 'bg-danger': severityCritical || severityHigh, 'bg-warning': severityMedium, 'bg-success': severityLow }">{{ cvssScore }} ({{ severity }})</span></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
