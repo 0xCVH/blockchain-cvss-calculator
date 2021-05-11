@@ -411,13 +411,13 @@ var ScoreModal = Vue.component('ScoreModal', {
     /**
      * Copies a Markdown formatted link to the clipboard with following format:
      *
-     *     [<CVSS vector>](<url>) (<CVSS score> / $<suggested bounty>)
+     *     [<CVSS vector>](<url>) (<CVSS score> / <severity> / $<suggested bounty>)
      *
      * @param {Object} e The click event.
      */
     copyMarkdownLinkToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`[${this.cvssVector}](${document.location}) (${this.cvssScore} / ${this.suggestedBounty})`);
+      this.copyToClipboard(`[${this.cvssVector}](${document.location}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty})`);
       this.$refs.btnCopyMarkdownLink.innerText = "Copied URL to clipboard!";
     },
     /**
