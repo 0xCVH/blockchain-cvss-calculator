@@ -264,26 +264,26 @@ var ScoreModal = Vue.component('ScoreModal', {
         Critical: {
           minScore: 9.0,
           maxScore: 10.0,
-          minBounty: 10000,
-          maxBounty: 20000
+          minBounty: 20000,
+          maxBounty: 35000
         },
         High: {
           minScore: 7.0,
           maxScore: 8.9,
-          minBounty: 3000,
-          maxBounty: 10000
+          minBounty: 5000,
+          maxBounty: 15000
         },
         Medium: {
           minScore: 4.0,
           maxScore: 6.9,
-          minBounty: 500,
-          maxBounty: 1500
+          minBounty: 1000,
+          maxBounty: 2500
         },
         Low: {
           minScore: 0.1,
           maxScore: 3.9,
-          minBounty: 50,
-          maxBounty: 500
+          minBounty: 100,
+          maxBounty: 750
         }
       }
     }
