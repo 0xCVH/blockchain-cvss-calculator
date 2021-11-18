@@ -114,6 +114,14 @@
               <h2 class="display-6">💰 Suggested Bounty 💰</h2>
               <h3 class="display-5">{{ suggestedBounty }}</h3>
             </div>
+
+            <div class="bounty-range text-center">
+              <p>Bounty Range:</p>
+              <div class="btn-group">
+                <a href="#" data-bounty-range="old" v-on:click="changeBountyRange" class="btn btn-outline-primary" :class="bountyRange == 'old' ? 'active' : ''">Pre Nov 22, 2021</a>
+                <a href="#" data-bounty-range="new" v-on:click="changeBountyRange" class="btn btn-outline-primary" :class="bountyRange == 'new' ? 'active' : ''">Post Nov 22, 2021</a>
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" v-on:click="copyMarkdownLinkToClipboard" ref="btnCopyMarkdownLink">Copy Markdown link</button>
