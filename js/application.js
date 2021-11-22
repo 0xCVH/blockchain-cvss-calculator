@@ -260,30 +260,59 @@ var ScoreModal = Vue.component('ScoreModal', {
       severityMedium: false,
       severityLow: false,
       suggestedBounty: 0,
+      bountyRange: 'old',
       bountyRanges: {
-        Critical: {
-          minScore: 9.0,
-          maxScore: 10.0,
-          minBounty: 10000,
-          maxBounty: 20000
+        old: {
+          Critical: {
+            minScore: 9.0,
+            maxScore: 10.0,
+            minBounty: 10000,
+            maxBounty: 20000
+          },
+          High: {
+            minScore: 7.0,
+            maxScore: 8.9,
+            minBounty: 3000,
+            maxBounty: 10000
+          },
+          Medium: {
+            minScore: 4.0,
+            maxScore: 6.9,
+            minBounty: 500,
+            maxBounty: 1500
+          },
+          Low: {
+            minScore: 0.1,
+            maxScore: 3.9,
+            minBounty: 50,
+            maxBounty: 500
+          }
         },
-        High: {
-          minScore: 7.0,
-          maxScore: 8.9,
-          minBounty: 3000,
-          maxBounty: 10000
-        },
-        Medium: {
-          minScore: 4.0,
-          maxScore: 6.9,
-          minBounty: 500,
-          maxBounty: 1500
-        },
-        Low: {
-          minScore: 0.1,
-          maxScore: 3.9,
-          minBounty: 50,
-          maxBounty: 500
+        new: {
+          Critical: {
+            minScore: 9.0,
+            maxScore: 10.0,
+            minBounty: 20000,
+            maxBounty: 35000
+          },
+          High: {
+            minScore: 7.0,
+            maxScore: 8.9,
+            minBounty: 5000,
+            maxBounty: 15000
+          },
+          Medium: {
+            minScore: 4.0,
+            maxScore: 6.9,
+            minBounty: 1000,
+            maxBounty: 2500
+          },
+          Low: {
+            minScore: 0.1,
+            maxScore: 3.9,
+            minBounty: 100,
+            maxBounty: 750
+          }
         }
       }
     }
@@ -342,15 +371,9 @@ var ScoreModal = Vue.component('ScoreModal', {
     /**
      * Calculates the suggested bounty based on the CVSS score and populates the suggestBounty data
      * attribute with the number with pretty formatting.
-     *
-     * @param {number} score     The CVSS score.
-     * @param {number} minScore  The minimum score.
-     * @param {number} maxScore  The maximum score.
-     * @param {number} minBounty The minimum bounty.
-     * @param {number} maxBounty The maximum bounty.
      */
-    calculateSuggestedBounty: function (score, minScore, maxScore, minBounty, maxBounty) {
-      range = this.bountyRanges[this.severity];
+    calculateSuggestedBounty: function () {
+      range = this.bountyRanges[this.bountyRange][this.severity];
       bounty = this.getBounty(this.cvssScore, range.minScore, range.maxScore, range.minBounty, range.maxBounty);
       this.suggestedBounty = this.formatBounty(bounty);
     },
@@ -455,6 +478,21 @@ var ScoreModal = Vue.component('ScoreModal', {
       el.select();
       document.execCommand('copy');
       this.$el.removeChild(el);
+    },
+    /**
+     * Changes the active bounty range when a bounty range is clicked.
+     *
+     * @param {Object} e The click event.
+     */
+    changeBountyRange: function (e) {
+      e.preventDefault();
+      const range = e.target.getAttribute('data-bounty-range')
+      if (!(range in this.bountyRanges)) {
+        this.bountyRange = 'old';
+      } else {
+        this.bountyRange = range;
+      }
+      this.calculateSuggestedBounty();
     }
   }
 });
