@@ -92,6 +92,53 @@ Vue.component('skipquestions', {
 });
 
 /**
+ * Definitions allows all metric scoring definitions
+ * to be viewed.
+ *
+ */
+Vue.component('Definitions', {
+  template: '#definitions-template',
+  data () {
+    return {
+      definitionsShown: false,
+      definitions: [],
+    }
+  },
+  methods: {
+    /**
+     * Toggles whether we show the definitions section.
+     *
+     * @param {Object} e The click event.
+     */
+    toggleDefinitions: function (e) {
+      e.preventDefault();
+
+      // If we haven't already gathered the definitions
+      if (!!this.definitions) {
+        // Iterate over the calculator's questions
+        for (let key in this.$parent.questions) {
+          question = this.$parent.questions[key];
+
+          for (let answer of question.answers) {
+            // Only look at questions that result in a CVSS Metric Value
+            if (typeof answer.cvss_metric !== 'undefined') {
+              // Add it to the list
+              this.definitions.push({
+                metric_value: answer.cvss_metric,
+                extra: answer.extra,
+                examples: answer.examples
+              })
+            }
+          }
+        }
+      }
+
+      this.definitionsShown = !this.definitionsShown ;
+    },
+  }
+});
+
+/**
  * ScoreCard represents a single CVSS metric which is rendered in ScoreModal for each metric.
  */
 Vue.component('ScoreCard', {
@@ -157,7 +204,7 @@ Vue.component('ScoreCard', {
       humanScores: {
         AV: {
           N: 'Network',
-          A: 'Adjecent',
+          A: 'Adjacent',
           L: 'Local',
           P: 'Physical'
         },
@@ -434,13 +481,13 @@ var ScoreModal = Vue.component('ScoreModal', {
     /**
      * Copies a Markdown formatted link to the clipboard with following format:
      *
-     *     [<CVSS vector>](<url>) (<CVSS score> / <severity> / $<suggested bounty>)
+     *     [<CVSS vector>](<url>) (<CVSS score> / <severity> / $<suggested bounty> / <bounty range name> bounty range)
      *
      * @param {Object} e The click event.
      */
     copyMarkdownLinkToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`[${this.cvssVector}](${document.location}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty})`);
+      this.copyToClipboard(`[${this.cvssVector}](${document.location}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
       this.$refs.btnCopyMarkdownLink.innerText = "Copied URL to clipboard!";
     },
     /**
@@ -533,7 +580,8 @@ var app = new Vue({
         question: 'Can the vulnerability be exploited from across a router (OSI layer 3 network)?',
         answers: [{
           answer: 'Yes',
-          extra: 'Vulnerability is exploitable from across the internet.',
+          extra: 'Vulnerability is exploitable from across the internet. This is the case for nearly all GitLab security issues.',
+          cvss_metric: 'AV:N',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'N';
             this.app.goToPage('attack_complexity_1');
@@ -541,6 +589,7 @@ var app = new Vue({
         }, {
           answer: 'No',
           extra: 'Vulnerability is exploitable across a limited physical or logical network distance.',
+          cvss_metric: 'AV:A',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'A';
             this.app.goToPage('attack_complexity_1');
@@ -553,13 +602,15 @@ var app = new Vue({
         answers: [{
           answer: 'Yes',
           extra: 'Attacker requires physical access to the vulnerable component.',
+          cvss_metric: 'AV:L',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'L'
             this.app.goToPage('attack_complexity_1');
           }
         }, {
           answer: 'No',
-          extra: 'Attack is committed through a local application vulnerability, or the attacker is able to log in locally.',
+          extra: 'Attack is committed through a local application vulnerability, by the victim running something locally, or the attacker is able to log in locally.',
+          cvss_metric: 'AV:L',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'P';
             this.app.goToPage('attack_complexity_1');
@@ -576,6 +627,7 @@ var app = new Vue({
             'IDOR using simple guessable ID',
             "Stored XSS on a page that's part of the user's normal workflow (main project page, issue or merge request page, etc.)"
           ],
+          cvss_metric: 'AC:L',
           onSelect: () => {
             this.app.cvssMetrics.AC = 'L';
             this.app.goToPage('privileges_required_1');
@@ -589,6 +641,7 @@ var app = new Vue({
             "CSRF and reflected XSS because it's likely the victim will not click the attacker's link",
             "Stored XSS on an obscure page that the victim's unlikely to visit without clicking a link from the attacker (on a specific job's build log for example)"
           ],
+          cvss_metric: 'AC:H',
           onSelect: () => {
             this.app.cvssMetrics.AC = 'H';
             this.app.goToPage('privileges_required_1');
@@ -607,8 +660,9 @@ var app = new Vue({
           answer: 'No',
           examples: [
             'Permission issues allowing an unauthenticated account to access confidential information through the API',
-            "CSRF or reflected XSS issues, assuming a privileged account isn't required to craft the attack URL",
+            "CSRF or reflected XSS issues, assuming a privileged account isn't required to craft the attack URL. (The attacker is logged out - PR:N - but the victim is logged in).",
           ],
+          cvss_metric: 'PR:N',
           onSelect: () => {
             this.app.cvssMetrics.PR = 'N';
             this.app.goToPage('user_interaction_1');
@@ -617,17 +671,27 @@ var app = new Vue({
       },
       privileges_required_2: {
         title: 'Privileges Required',
-        question: 'Are administrator privileges required?',
+        question: 'Are administrator or "high" privileges required?',
         answers: [{
           answer: 'Yes',
-          extra: 'Administrator or system level access required. Side note: high privilege users using a bug to sabotage their own projects is out of scope of our bug bounty program.',
+          extra: 'The attack requires Maintainer/Owner membership to a specific project/group, or instance admin rights.',
+          examples: [
+            "Maintainer/Owner role is required in victim's existing project/group to carry out the attack.",
+            "Side note: high privilege users using a bug to sabotage their own projects is out of scope of our bug bounty program."
+          ],
+          cvss_metric: 'PR:H',
           onSelect: () => {
             this.app.cvssMetrics.PR = 'H';
             this.app.goToPage('user_interaction_1');
           }
         }, {
           answer: 'No',
-          extra: 'User level access required.',
+          extra: 'The attack requires an authenticated user, or sub-Maintainer/sub-Owner membership to a specific group/project, or sub-admin instance rights.',
+          examples: [
+            "An authenticated user is required to carry out the attack",
+            "Maintainer/Owner role is required to carry out the attack. However, the attacker can carry out the attack by creating a new project/group and inviting the victim to it."
+          ],
+          cvss_metric: 'PR:L',
           onSelect: () => {
             this.app.cvssMetrics.PR = 'L';
             this.app.goToPage('user_interaction_1');
@@ -643,6 +707,7 @@ var app = new Vue({
           examples: [
             'All vulnerabilities that need a victim to do any stort of action even if the action is only to log on GitLab, this includes all XSS and CSRF vulnerabilities'
           ],
+          cvss_metric: 'UI:R',
           onSelect: () => {
             this.app.cvssMetrics.UI = 'R';
             this.app.goToPage('scope_1');
@@ -653,6 +718,7 @@ var app = new Vue({
           examples: [
             'Any attack that would work even if the victim never logs back in to GitLab'
           ],
+          cvss_metric: 'UI:N',
           onSelect: () => {
             this.app.cvssMetrics.UI = 'N';
             this.app.goToPage('scope_1');
@@ -669,6 +735,7 @@ var app = new Vue({
             'XSS (vulnerable component is the website, impacted component is the browser)',
             'SSRF in GitLab that allows fetching GCP metadata'
           ],
+          cvss_metric: 'S:C',
           onSelect: () => {
             this.app.cvssMetrics.S = 'C';
             this.app.goToPage('confidentiality_impact_1');
@@ -676,6 +743,7 @@ var app = new Vue({
         }, {
           answer: 'No',
           extra: 'Impact is localized to the exploitable component.',
+          cvss_metric: 'S:U',
           onSelect: () => {
             this.app.cvssMetrics.S = 'U';
             this.app.goToPage('confidentiality_impact_1');
@@ -692,7 +760,8 @@ var app = new Vue({
           }
         }, {
           answer: 'No',
-          extra: 'No information is disclosed.',
+          extra: 'No confidential information is disclosed.',
+          cvss_metric: 'C:N',
           onSelect: () => {
             this.app.cvssMetrics.C = "N";
             this.app.goToPage('integrity_impact_1');
@@ -704,7 +773,13 @@ var app = new Vue({
         question: 'Can attacker obtain all information from impacted component, or is the disclosed information critical?',
         answers: [{
           answer: 'Yes',
-          extra: 'All information is disclosed to attacker, or only some critical information is disclosed.',
+          extra: 'All information is disclosed to attacker, or some critical information is disclosed.',
+          examples: [
+            "Full read access to an instance",
+            "Access tokens, runner tokens, session IDs",
+            "Private repositories"
+          ],
+          cvss_metric: 'C:H',
           onSelect: () => {
             this.app.cvssMetrics.C = 'H';
             this.app.goToPage('integrity_impact_1');
@@ -718,6 +793,7 @@ var app = new Vue({
             "Access to private data that the attacker doesn't have access to anymore, but had access to in the past",
             'Access to private data of minor importance (issue due dates, private project name, etc.)'
           ],
+          cvss_metric: 'S:L',
           onSelect: () => {
             this.app.cvssMetrics.C = 'L';
             this.app.goToPage('integrity_impact_1');
@@ -735,6 +811,7 @@ var app = new Vue({
         }, {
           answer: 'No',
           extra: 'No integrity loss.',
+          cvss_metric: 'I:N',
           onSelect: () => {
             this.app.cvssMetrics.I = 'N';
             this.app.goToPage('availability_impact_1');
@@ -750,8 +827,9 @@ var app = new Vue({
           examples: [
             "Attacker can add a malicious Runner to a project where they don't have the required permissions to do so",
             "Attacker can add a malicious OAuth application to the victim's trusted apps",
-            'Attacker can modify all issues on the GitLab instance'
+            'Attacker can modify data on the GitLab instance'
           ],
+          cvss_metric: 'I:H',
           onSelect: () => {
             this.app.cvssMetrics.I = 'H';
             this.app.goToPage('availability_impact_1');
@@ -759,6 +837,13 @@ var app = new Vue({
         }, {
           answer: 'No',
           extra: 'Some information can be altered, and/or attacker does not have control over kind or degree.',
+          examples: [
+            'Able to modify private issue/MR titles but not their content',
+            'Able to modify a small number of private issues/MR (one or a handful of projects, as opposed to being able to read any private issue on the instance)',
+            "Able to modify private data that the attacker doesn't have access to anymore, but had access to in the past",
+            'Able to modify private data of minor importance (issue due dates, private project name, etc.)'
+          ],
+          cvss_metric: 'I:L',
           onSelect: () => {
             this.app.cvssMetrics.I = 'L';
             this.app.goToPage('availability_impact_1');
@@ -776,6 +861,7 @@ var app = new Vue({
         }, {
           answer: 'No',
           extra: 'No Availability impact.',
+          cvss_metric: 'A:N',
           onSelect: () => {
             this.app.cvssMetrics.A = 'N';
             this.app.goToScore();
@@ -787,23 +873,25 @@ var app = new Vue({
         question: 'Can attacker completely deny access to affected component, or is the resource critical?',
         answers: [{
           answer: 'Yes',
-          extra: 'Resource is completely unavailable, or select resource is critical to the component',
+          extra: 'Access is denied to a critical resource or the entire system is affected',
           examples: [
             'The attacker can delete projects or groups',
             'Runners all stop picking up pipelines',
             'GitLab instance taken down'
           ],
+          cvss_metric: 'A:H',
           onSelect: () => {
             this.app.cvssMetrics.A = 'H';
             this.app.goToScore();
           }
         }, {
           answer: 'No',
-          extra: 'Reduced performance or interruption of resource availability or response.',
+          extra: 'Reduced performance, or access is denied to a non-critical resource, or only a part of the system is affected',
           examples: [
             'A small amount of projects are inaccessible but become available when the attack stops',
             "A small amount of users can't use the instance"
           ],
+          cvss_metric: 'A:L',
           onSelect: () => {
             this.app.cvssMetrics.A = 'L';
             this.app.goToScore();
