@@ -78,7 +78,7 @@ Vue.component('skipquestions', {
      * trigger the score route.
      */
     showScore: function () {
-      window.location.hash = `#${this.cvssVector}`;
+      window.location.hash = `#vector=${this.cvssVector}`;
     }
   },
   watch: {
@@ -286,7 +286,18 @@ Vue.component('ScoreCard', {
  * ScoreModal represents the final modal screen which presents the CVSS score and suggested bounty.
  */
 var ScoreModal = Vue.component('ScoreModal', {
-  props: ['cvssVector'],
+  props: {
+    cvssVector: {
+      type: String,
+      required: true,
+    },
+    bountyRange: {
+      type: String,
+      default: function () {
+        return 'old';
+      },
+    },
+  },
   template: '#score-modal-template',
   data () {
     return {
@@ -307,7 +318,6 @@ var ScoreModal = Vue.component('ScoreModal', {
       severityMedium: false,
       severityLow: false,
       suggestedBounty: 0,
-      bountyRange: 'old',
       bountyRanges: {
         old: {
           Critical: {
@@ -487,7 +497,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyMarkdownLinkToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`[${this.cvssVector}](${document.location}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
+      this.copyToClipboard(`[${this.cvssVector}](${document.location.protocol}//${document.location.host}/#vector=${this.cvssVector}&range=${this.bountyRange}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
       this.$refs.btnCopyMarkdownLink.innerText = "Copied URL to clipboard!";
     },
     /**
@@ -497,7 +507,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyURLToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(document.location);
+      this.copyToClipboard(`${document.location.protocol}//${document.location.host}/#vector=${this.cvssVector}&range=${this.bountyRange}`);
       this.$refs.btnCopyUrl.innerText = "Copied URL to clipboard!";
     },
     /**
@@ -557,6 +567,7 @@ var app = new Vue({
       I: undefined,
       A: undefined,
     },
+    bountyRange: 'old',
     current_route: window.location.hash,
     current_question: 'attack_vector_1',
     questions: {
@@ -917,10 +928,13 @@ var app = new Vue({
      * @param {string} fragment The page fragment / hash without the leading '#'
      */
     showPageFromFragment: function (fragment) {
+      // Show first question if fragment is empty.
       if (fragment === "") {
         this.showQuestion('attack_vector_1');
         return;
       }
+
+      // Show score if fragment is a CVSS vector string.
       const key = fragment.substring(1);
       if (CVSS.vectorStringRegex_30.test(key)) {
         this.showQuestion('attack_vector_1');
@@ -929,8 +943,22 @@ var app = new Vue({
         this.showScore();
         return;
       }
+
+      // Show question if fragment matches a question key.
       if (key in this.questions) {
         this.showQuestion(key);
+        return;
+      }
+
+      // Show score if fragment matches `vector=<cvss vector>&range=<range>` URL param string.
+      const urlParams = new URLSearchParams(key);
+      if (urlParams.has('vector') && CVSS.vectorStringRegex_30.test(urlParams.get('vector'))) {
+        this.cvssVector = key;
+        this.populateCvssMetricsFromVector(urlParams.get('vector'));
+        if (urlParams.has('range')) {
+          this.bountyRange = urlParams.get('range');
+        }
+        this.showScore();
       } else {
         this.showQuestion('attack_vector_1');
       }
@@ -950,7 +978,7 @@ var app = new Vue({
      */
     goToScore: function () {
       const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
-      window.location.hash = `#${cvssVector}`;
+      window.location.hash = `#vector=${cvssVector}&range=${this.bountyRange}`;
     },
     /**
      * Renders the CVSS score page / modal with the current CVSS metrics.
@@ -958,7 +986,7 @@ var app = new Vue({
     showScore: function () {
       const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
       let modalInstance = new ScoreModal({
-        propsData: { cvssVector: cvssVector }
+        propsData: { cvssVector: cvssVector, bountyRange: this.bountyRange }
       });
       modalInstance.$mount();
       this.$el.appendChild(modalInstance.$el);
@@ -969,7 +997,7 @@ var app = new Vue({
       modal.show();
     },
     /**
-     * Convers the given metrics object to a CVSS 3.0 vector string.
+     * Converts the given metrics object to a CVSS 3.0 vector string.
      *
      * @param {Object} metrics
      * @return {string} The CVSS 3.0 vector string.
