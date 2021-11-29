@@ -866,6 +866,7 @@ var app = new Vue({
         question: 'Is there any impact to the availability of a resource?',
         answers: [{
           answer: 'Yes',
+          extra: 'Note that being able to delete data in the application is considered integrity impact and not availability.',
           onSelect: () => {
             this.app.goToPage('availability_impact_2');
           }
@@ -886,7 +887,6 @@ var app = new Vue({
           answer: 'Yes',
           extra: 'Access is denied to a critical resource or the entire system is affected',
           examples: [
-            'The attacker can delete projects or groups',
             'Runners all stop picking up pipelines',
             'GitLab instance taken down'
           ],
