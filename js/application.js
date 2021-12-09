@@ -497,7 +497,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyMarkdownLinkToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`[${this.cvssVector}](${document.location.protocol}//${document.location.host}/#vector=${this.cvssVector}&range=${this.bountyRange}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
+      this.copyToClipboard(`[${this.cvssVector}](${document.location}/#vector=${this.cvssVector}&range=${this.bountyRange}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
       this.$refs.btnCopyMarkdownLink.innerText = "Copied URL to clipboard!";
     },
     /**
@@ -507,7 +507,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyURLToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`${document.location.protocol}//${document.location.host}/#vector=${this.cvssVector}&range=${this.bountyRange}`);
+      this.copyToClipboard(`${document.location}/#vector=${this.cvssVector}&range=${this.bountyRange}`);
       this.$refs.btnCopyUrl.innerText = "Copied URL to clipboard!";
     },
     /**
