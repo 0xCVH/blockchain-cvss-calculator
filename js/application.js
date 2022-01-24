@@ -489,6 +489,14 @@ var ScoreModal = Vue.component('ScoreModal', {
       return (Math.ceil(num / precision) * precision);
     },
     /**
+     * Returns the document's location without the trailing `/#` part
+     *
+     * @return {String}
+     */
+    locationWithoutFragment: function() {
+      return document.location.href.replace(/\/?#.*$/, '');
+    },
+    /**
      * Copies a Markdown formatted link to the clipboard with following format:
      *
      *     [<CVSS vector>](<url>) (<CVSS score> / <severity> / $<suggested bounty> / <bounty range name> bounty range)
@@ -497,7 +505,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyMarkdownLinkToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`[${this.cvssVector}](${document.location}/#vector=${this.cvssVector}&range=${this.bountyRange}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
+      this.copyToClipboard(`[${this.cvssVector}](${this.locationWithoutFragment()}/#vector=${this.cvssVector}&range=${this.bountyRange}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
       this.$refs.btnCopyMarkdownLink.innerText = "Copied URL to clipboard!";
     },
     /**
@@ -507,7 +515,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyURLToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`${document.location}/#vector=${this.cvssVector}&range=${this.bountyRange}`);
+      this.copyToClipboard(`${this.locationWithoutFragment()}/#vector=${this.cvssVector}&range=${this.bountyRange}`);
       this.$refs.btnCopyUrl.innerText = "Copied URL to clipboard!";
     },
     /**
