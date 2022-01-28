@@ -657,8 +657,7 @@ var app = new Vue({
           examples: [
             'Knowledge of a private project name is required to carry out the attack',
             'A certain setting has to have a non-default value to make the attack possible',
-            "CSRF and reflected XSS because it's likely the victim will not click the attacker's link",
-            "Stored XSS on an obscure page that the victim's unlikely to visit without clicking a link from the attacker (on a specific job's build log for example)"
+            'Exploitation depends on a specific timing and cannot always be reproduced'
           ],
           cvss_metric: 'AC:H',
           onSelect: () => {
