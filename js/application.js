@@ -575,7 +575,7 @@ var app = new Vue({
       I: undefined,
       A: undefined,
     },
-    bountyRange: 'old',
+    bountyRange: 'new',
     current_route: window.location.hash,
     current_question: 'attack_vector_1',
     questions: {
