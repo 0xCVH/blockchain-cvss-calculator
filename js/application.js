@@ -750,6 +750,7 @@ var app = new Vue({
           answer: 'Yes',
           extra: 'Impact caused to systems beyond the exploitable component.',
           examples: [
+            'Protected CI/CD variables (vulnerable component is GitLab, impacted component is a production server and/or 3rd party systems)',
             'XSS (vulnerable component is the website, impacted component is the browser)',
             'SSRF in GitLab that allows fetching GCP metadata'
           ],
