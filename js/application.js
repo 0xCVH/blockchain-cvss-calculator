@@ -60,15 +60,23 @@ Vue.component('skipquestions', {
     /**
      * Validates the CVSS vector entered into the form and enables the submit button if valid.
      *
-     * Accepts CVSS 3.0 vector strings with and without the version identifier. If the version
-     * identifier is missing, it will be automatically prepended to the entered CVSS vector.
+     * Accepts CVSS 3.X vector strings with and without the version identifier. If the version
+     * identifier is missing, 3.1 will be automatically prepended to the entered CVSS vector.
      */
     validateCvssVector: function () {
+      // v3.0 (deprecated)
       if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
         return true;
       }
-      if (CVSS.vectorStringRegex_30.test(`${CVSS.CVSSVersionIdentifier}/${this.cvssVector}`)) {
-        this.cvssVector = `${CVSS.CVSSVersionIdentifier}/${this.cvssVector}`;
+
+      // v3.1
+      if (CVSS31.vectorStringRegex_31.test(this.cvssVector)) {
+        return true;
+      }
+
+      // No version, fallback to 3.1
+      if (CVSS31.vectorStringRegex_31.test(`${CVSS31.CVSSVersionIdentifier}/${this.cvssVector}`)) {
+        this.cvssVector = `${CVSS31.CVSSVersionIdentifier}/${this.cvssVector}`;
         return true;
       }
       return false;
@@ -297,6 +305,7 @@ var ScoreModal = Vue.component('ScoreModal', {
         return 'old';
       },
     },
+    oldCVSSVersion: false,
   },
   template: '#score-modal-template',
   data () {
@@ -385,7 +394,18 @@ var ScoreModal = Vue.component('ScoreModal', {
      * Calculates the CVSS score from the metrics.
      */
     calculateCVSS: function () {
-      var score = CVSS.calculateCVSSFromVector(this.cvssVector);
+      var score;
+
+      if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
+        score = CVSS.calculateCVSSFromVector(this.cvssVector);
+        this.oldCVSSVersion = true;
+      } else if (CVSS31.vectorStringRegex_31.test(this.cvssVector)) {
+        score = CVSS31.calculateCVSSFromVector(this.cvssVector);
+        this.oldCVSSVersion = false;
+      } else {
+        console.warn('Unknown CVSS version: ' + this.cvssVector);
+      }
+
       this.cvssScore = score.baseMetricScore;
       this.severity = score.baseSeverity;
     },
@@ -395,7 +415,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      * @param {string} vector The CVSS vector string
      */
     populateCvssMetricsFromVector: function (vector) {
-      var metrics = vector.substring(CVSS.CVSSVersionIdentifier.length).split("/");
+      var metrics = vector.substring(CVSS31.CVSSVersionIdentifier.length).split("/");
       for (const m of metrics) {
         if (m === "") {
           continue;
@@ -920,6 +940,9 @@ var app = new Vue({
     }
   },
   methods: {
+    validCVSS: function (vector) {
+      return CVSS.vectorStringRegex_30.test(vector) || CVSS31.vectorStringRegex_31.test(vector);
+    },
     /**
      * Renders a question with the given key.
      *
@@ -944,7 +967,7 @@ var app = new Vue({
 
       // Show score if fragment is a CVSS vector string.
       const key = fragment.substring(1);
-      if (CVSS.vectorStringRegex_30.test(key)) {
+      if (this.validCVSS(key)) {
         this.showQuestion('attack_vector_1');
         this.cvssVector = key;
         this.populateCvssMetricsFromVector(this.cvssVector);
@@ -960,16 +983,21 @@ var app = new Vue({
 
       // Show score if fragment matches `vector=<cvss vector>&range=<range>` URL param string.
       const urlParams = new URLSearchParams(key);
-      if (urlParams.has('vector') && CVSS.vectorStringRegex_30.test(urlParams.get('vector'))) {
-        this.cvssVector = key;
-        this.populateCvssMetricsFromVector(urlParams.get('vector'));
-        if (urlParams.has('range')) {
-          this.bountyRange = urlParams.get('range');
+      if (urlParams.has('vector')) {
+        this.cvssVector = urlParams.get('vector');
+        if (this.validCVSS(this.cvssVector)) {
+          this.populateCvssMetricsFromVector(this.cvssVector);
+          if (urlParams.has('range')) {
+            this.bountyRange = urlParams.get('range');
+          }
+          this.showScore();
+          return;
+        } else {
+          console.warn("Invalid / unsupported CVSS:", this.cvssVector)
         }
-        this.showScore();
-      } else {
-        this.showQuestion('attack_vector_1');
       }
+
+      this.showQuestion('attack_vector_1');
     },
     /**
      * Modifies the document location to point at the given page fragment / hash to trigger the
@@ -1005,13 +1033,19 @@ var app = new Vue({
       modal.show();
     },
     /**
-     * Converts the given metrics object to a CVSS 3.0 vector string.
+     * Converts the given metrics object to a CVSS 3.1 vector string.
      *
      * @param {Object} metrics
-     * @return {string} The CVSS 3.0 vector string.
+     * @return {string} The CVSS 3.x vector string.
      */
     cvssMetricsToVector: function (metrics) {
-      var vector = `${CVSS.CVSSVersionIdentifier}`
+      var vector = '';
+      if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
+        vector = CVSS.CVSSVersionIdentifier;
+      } else {
+        // Default to 3.1
+        vector = CVSS31.CVSSVersionIdentifier;
+      }
       for (const [metric, value] of Object.entries(metrics)) {
         vector += `/${metric}:${value}`
       }
@@ -1020,10 +1054,10 @@ var app = new Vue({
     /**
      * Parses the given CVSS vector string and populates the CVSS metrics object with correct values.
      *
-     * @param {string} vector The CVSS 3.0 vector string
+     * @param {string} vector The CVSS 3.x vector string
      */
     populateCvssMetricsFromVector: function (vector) {
-      var metrics = vector.substring(CVSS.CVSSVersionIdentifier.length).split("/");
+      var metrics = vector.substring(CVSS31.CVSSVersionIdentifier.length).split("/");
       for (const m of metrics) {
         if (m === "") {
           continue;

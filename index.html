@@ -19,7 +19,7 @@
       <div class="bg-light p-5 rounded">
         <h1>GitLab CVSS Calculator</h1>
         <p class="lead">This calculator is used to calculate bounties for vulnerabilities reported to GitLab's <a href="https://hackerone.com/gitlab">Bug Bounty Program on HackerOne</a> or via our <a href="https://about.gitlab.com/security/disclosure/">Responsible Disclosure Policy</a>.
-          Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.0/specification-document">CVSS</a>)
+          Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.1/specification-document">CVSS</a>)
           which is used to calculate a suggested bug bounty based on the impact.</p>
         <p class="lead">For GitLab team member token disclosure and leakage of GitLab customer data in issues, the suggested bounty amount would be as defined below:
           <ul class="lead">
@@ -74,8 +74,8 @@
       <a href="#" v-on:click="showForm" v-show="!formShown">Skip questions, I already have a CVSS vector.</a>
       <form v-show="formShown">
         <div class="input-group input-group-lg">
-          <input type="text" class="form-control" v-model="cvssVector" placeholder="CVSS vector... e.g. CVSS:3.0/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:H/A:H" aria-label="CVSS Vector" aria-describedby="button-submit-cvss-vector" required>
-          <button class="btn btn-outline-secondary" type="button" id="button-submit-cvss-vector" :disabled="!validCvssVector" v-on:click="showScore">Submit</button>
+          <input type="text" class="form-control" v-model="cvssVector" placeholder="CVSS vector... e.g. CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:C/C:H/I:H/A:H" aria-label="CVSS Vector" aria-describedby="button-submit-cvss-vector" required>
+          <button class="btn btn-outline-primary" type="button" id="button-submit-cvss-vector" :disabled="!validCvssVector" v-on:click="showScore">Submit</button>
         </div>
       </form>
     </div>
@@ -107,7 +107,9 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">{{cvssVector}} <span class="badge rounded-pill"
+            <h5 class="modal-title">
+              <span v-if="oldCVSSVersion"><a title="CVSS3.0 is deprecated at GitLab">⚠️</a>&nbsp;&nbsp;</span>
+              {{cvssVector}} <span class="badge rounded-pill"
               :class="{ 'bg-danger': severityCritical || severityHigh, 'bg-warning': severityMedium, 'bg-success': severityLow }">{{ cvssScore }} ({{ severity }})</span></h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -134,6 +136,7 @@
             </div>
           </div>
           <div class="modal-footer">
+            <p class="text-right text-muted" v-if="oldCVSSVersion">⚠️&nbsp;&nbsp;CVSS3.0 is deprecated at GitLab. Use CVSS3.1.</p>
             <button type="button" class="btn btn-primary" v-on:click="copyMarkdownLinkToClipboard" ref="btnCopyMarkdownLink">Copy Markdown link</button>
             <button type="button" class="btn btn-primary" v-on:click="copyURLToClipboard" ref="btnCopyUrl">Copy URL</button>
             <button type="button" class="btn btn-primary" v-on:click="copyVectorToClipboard" ref="btnCopyVector">Copy vector</button>
@@ -190,6 +193,7 @@
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   <script src="js/cvsscalc30.js"></script>
+  <script src="js/cvsscalc31.js"></script>
   <script src="js/application.js"></script>
 </body>
 
