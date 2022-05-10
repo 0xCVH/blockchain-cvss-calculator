@@ -21,6 +21,19 @@
         <p class="lead">This calculator is used to calculate bounties for vulnerabilities reported to GitLab's <a href="https://hackerone.com/gitlab">Bug Bounty Program on HackerOne</a> or via our <a href="https://about.gitlab.com/security/disclosure/">Responsible Disclosure Policy</a>.
           Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.1/specification-document">CVSS</a>)
           which is used to calculate a suggested bug bounty based on the impact.</p>
+      </div>
+
+      <transition name="slide-fade" mode="out-in">
+        <Question v-bind:question="current_question" :key="current_question.question"></Question>
+      </transition>
+      <SkipQuestions></SkipQuestions>
+
+      <div class="bg-light p-5 rounded">
+        <p class="lead">The suggested bounty amounts for issues that aren't exploitable but would like to reward regardless are defined below:
+          <ul class="lead">
+            <li>Self-XSS: $100</li>
+          </ul>
+        </p>
         <p class="lead">For GitLab team member token disclosure and leakage of GitLab customer data in issues, the suggested bounty amount would be as defined below:
           <ul class="lead">
             <li>Leaked customer names: $500</li>
@@ -31,11 +44,6 @@
           </ul>
         </p>
       </div>
-
-      <transition name="slide-fade" mode="out-in">
-        <Question v-bind:question="current_question" :key="current_question.question"></Question>
-      </transition>
-      <SkipQuestions></SkipQuestions>
       <Definitions></Definitions>
     </div>
   </main>
