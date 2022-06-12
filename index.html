@@ -28,14 +28,18 @@
       </transition>
       <SkipQuestions></SkipQuestions>
 
-      <div class="bg-light p-5 rounded">
-        <p class="lead">The suggested bounty amounts for issues that aren't exploitable but we would like to reward regardless are defined below:
-          <ul class="lead">
+      <Definitions></Definitions>
+
+      <div class="examples">
+        <h3>Other Bounty Examples</h3>
+        <p>The suggested bounty amounts for issues that aren't exploitable but we would like to reward regardless are defined below:
+          <ul>
             <li>Self-XSS: $100</li>
           </ul>
         </p>
-        <p class="lead">For GitLab team member token disclosure and leakage of GitLab customer data in issues, the suggested bounty amount would be as defined below:
-          <ul class="lead">
+        <h4>Non-CVSS Bounties</h4>
+        <p>For GitLab team member token disclosure and leakage of GitLab customer data in issues, the suggested bounty amount would be as defined below:
+          <ul>
             <li>Leaked customer names: $500</li>
             <li>Leaked customer names, emails, financial data: $1,000</li>
             <li>Leaked non-maintainer access token: $7,500</li>
@@ -43,8 +47,8 @@
             <li>Leaked admin access token: $35,000</li>
           </ul>
         </p>
+        <p>Reports about intended behavior resulting in an update of our documentation will be rewarded with a $100 bounty, as long as this update is security related.</p>
       </div>
-      <Definitions></Definitions>
     </div>
   </main>
 
@@ -86,15 +90,6 @@
           <button class="btn btn-outline-primary" type="button" id="button-submit-cvss-vector" :disabled="!validCvssVector" v-on:click="showScore">Submit</button>
         </div>
       </form>
-    </div>
-  </script>
-
-  <script type="text/x-template" id="examples-template">
-    <div class="examples text-muted border-top fw-lighter">
-      <h6>Examples</h6>
-      <ul>
-        <li class="example" v-for="example in examples">{{ example }}</li>
-      </ul>
     </div>
   </script>
 
@@ -158,11 +153,11 @@
   <script type="text/x-template" id="definitions-template">
     <div class="definitions">
       <a href="#" v-on:click="toggleDefinitions" v-show="!definitionsShown">Show help & definitions.</a>
-      <a href="#" v-on:click="toggleDefinitions" v-show="definitionsShown">Hide definitions.</a>
+      <a href="#" v-on:click="toggleDefinitions" v-show="definitionsShown">Hide help & definitions.</a>
       <div v-show="definitionsShown">
         <h3>Background</h3>
         <p>
-          Accuracy and consistency of these scores is important. At any time when deciding on a score do not hesitate to ask for advice in the Bug Bounty Council issue or by reaching out to team members by any way you see fit.
+          Accuracy and consistency of these scores is important. At any time when deciding on a score do not hesitate to ask for advice in the Bug Bounty Council issue or by reaching out to team members by any way you see fit. All CVSS & bounty amounts are <a href="https://about.gitlab.com/handbook/engineering/security/security-engineering-and-research/application-security/runbooks/hackerone-process.html#awards">peer reviewed</a> as described in <a href="https://about.gitlab.com/handbook/engineering/security/security-engineering-and-research/application-security/runbooks/hackerone-process.html">our HackerOne Process runbook</a>.
         </p>
         <p>
           This is based on the <a href="https://www.first.org/cvss/user-guide">FIRST CVSS user guide</a>, especially the <a href="https://www.first.org/cvss/user-guide#Scoring-Rubrics">Scoring Rubrics section</a>. Remember, in particular, to "constrain impacts to a reasonable final impact which they are confident an attacker is able to achieve".

@@ -124,6 +124,10 @@ body {
     font-family: 'Source Sans 3',sans-serif;
 }
 
+.container {
+    padding-bottom:  50px;
+}
+
 a {
     color: #6b4fbb;
     text-decoration: none;
