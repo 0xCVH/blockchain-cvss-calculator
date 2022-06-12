@@ -108,7 +108,7 @@ Vue.component('Definitions', {
   template: '#definitions-template',
   data () {
     return {
-      definitionsShown: false,
+      definitionsShown: true,
       definitions: [],
     }
   },
@@ -120,7 +120,9 @@ Vue.component('Definitions', {
      */
     toggleDefinitions: function (e) {
       e.preventDefault();
-
+      this.definitionsShown = !this.definitionsShown ;
+    },
+    loadDefinitions: function (e) {
       // If we haven't already gathered the definitions
       if (!!this.definitions) {
         // Iterate over the calculator's questions
@@ -140,9 +142,10 @@ Vue.component('Definitions', {
           }
         }
       }
-
-      this.definitionsShown = !this.definitionsShown ;
-    },
+    }
+  },
+  mounted() {
+    this.loadDefinitions();
   }
 });
 
