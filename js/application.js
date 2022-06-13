@@ -832,7 +832,7 @@ var app = new Vue({
             "Access to private data that the attacker doesn't have access to anymore, but had access to in the past",
             'Access to private data of minor importance (issue due dates, private project name, etc.)'
           ],
-          cvss_metric: 'S:L',
+          cvss_metric: 'C:L',
           onSelect: () => {
             this.app.cvssMetrics.C = 'L';
             this.app.goToPage('integrity_impact_1');
