@@ -207,9 +207,9 @@ Vue.component('ScoreCard', {
           N: 'There is no loss of integrity within the impacted component.',
         },
         A: {
-          H: 'There is a total loss of availability, resulting in the attacker being able to fully deny access to resources in the impacted component; this loss is either sustained (while the attacker continues to deliver the attack) or persistent (the condition persists even after the attack has completed). Alternatively, the attacker has the ability to deny some availability, but the loss of availability presents a direct, serious consequence to the impacted component (e.g., the attacker cannot disrupt existing connections, but can prevent new connections; the attacker can repeatedly exploit a vulnerability that, in each instance of a successful attack, leaks a only small amount of memory, but after repeated exploitation causes a service to become completely unavailable).',
-          L: 'Performance is reduced or there are interruptions in resource availability. Even if repeated exploitation of the vulnerability is possible, the attacker does not have the ability to completely deny service to legitimate users. The resources in the impacted component are either partially available all of the time, or fully available only some of the time, but overall there is no direct, serious consequence to the impacted component.',
-          N: 'There is no impact to availability within the impacted component.',
+          H: 'There is a total persistent loss of availability, resulting in the attacker being able to fully deny access to resources in the impacted component;  the condition persists for 15+ minutes even after the attack has completed. An administrator has to take manual action to recover the component, or automated recovery actions take 15+ minutes.',
+          L: 'Performance is reduced or there are interruptions in resource availability. Even if repeated exploitation of the vulnerability is possible, the attacker does not have the ability to persistently deny service to legitimate users. Temporary interruptions recover automatically within 15 minutes. The resources in the impacted component are either partially available all of the time, or fully available only some of the time, but overall there is no direct, serious consequence to the impacted component.',
+          N: 'There is no or very negligible / unnoticeable impact to availability within the impacted component.',
         },
       },
       humanScores: {
@@ -905,6 +905,9 @@ var app = new Vue({
           answer: 'No',
           extra: 'No Availability impact.',
           cvss_metric: 'A:N',
+          examples: [
+            'Performance impacts that would not be noticed'
+          ],
           onSelect: () => {
             this.app.cvssMetrics.A = 'N';
             this.app.goToScore();
@@ -913,13 +916,14 @@ var app = new Vue({
       },
       availability_impact_2: {
         title: 'Availability Impact',
-        question: 'Can attacker completely deny access to affected component, or is the resource critical?',
+        question: 'Can the attacker deny access to an affected critical component even after their attack stops?',
         answers: [{
           answer: 'Yes',
-          extra: 'Access is denied to a critical resource or the entire system is affected',
+          extra: 'Manual administrator action required, or automated recovery takes longer than 15+ minutes',
           examples: [
-            'Runners all stop picking up pipelines',
-            'GitLab instance taken down'
+            'An administrator is required to delete files from a disk or remove spam database entries',
+            'Runners fail to pick up jobs even 15 minutes after an attack has stopped',
+            'GitLab instance taken down and cannot recover'
           ],
           cvss_metric: 'A:H',
           onSelect: () => {
@@ -928,10 +932,11 @@ var app = new Vue({
           }
         }, {
           answer: 'No',
-          extra: 'Reduced performance, or access is denied to a non-critical resource, or only a part of the system is affected',
+          extra: 'Reduced performance, or access is restored automatically or within 15 minutes of an attack stopping',
           examples: [
-            'A small amount of projects are inaccessible but become available when the attack stops',
-            "A small amount of users can't use the instance"
+            "A small amount of projects are inaccessible while the attack occurs",
+            "Users can't use the instance while the attack occurs",
+            "Runners fail to pick up jobs while the attack occurs, but begin again within 14 minutes"
           ],
           cvss_metric: 'A:L',
           onSelect: () => {
