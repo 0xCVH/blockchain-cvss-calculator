@@ -38,14 +38,20 @@
           </ul>
         </p>
         <h4>Non-CVSS Bounties</h4>
-        <p>For GitLab team member token disclosure and leakage of GitLab customer data in issues, the suggested bounty amount would be as defined below:
+        <p>For leakage of GitLab customer data or other PII, the suggested bounty amount would be as defined below:
           <ul>
             <li>Security-related documentation update: $100</li>
             <li>Leaked customer names: $500</li>
             <li>Leaked customer names, emails, financial data: $1,000</li>
-            <li>Leaked non-maintainer access token: $7,500</li>
-            <li>Leaked maintainer access token: $15,000</li>
-            <li>Leaked admin access token: $35,000</li>
+          </ul>
+        </p>
+        <p>For GitLab team member token disclosure where the tokens have access to important, the suggested bounty amount would be as defined below. Note that to reach the "maintainer" level, the token needs to have maintainer access on gitlab-org/gitlab or an equivalent "production" project.
+          <ul>
+            <li>Leaked non-maintainer access token on staging.gitlab.com: $0 (no sensitive issues to read unlike on gitlab.com)</li>
+            <li>Leaked non-maintainer access token on gitlab.com: $7,500</li>
+            <li>Leaked maintainer access token on gitlab.com: $15,000</li>
+            <li>Leaked admin access token on gitlab.com: $35,000</li>
+            <li>Leaked maintainer or admin access token on staging.gitlab.com: $15,000 (no customer data, admin and maintainer have similar impact)</li>
           </ul>
         </p>
         <p>Reports about intended behavior resulting in an update of our documentation will be rewarded with a $100 bounty, as long as this update is security related.</p>
