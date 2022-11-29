@@ -161,6 +161,7 @@ Vue.component('ScoreCard', {
       severityMedium: false,
       severityLow: false,
       humanFriendlyScore: undefined,
+      humanFriendlyScoreOptions: undefined,
       tooltip: null,
       humanMetrics: {
         AV: 'Attack Vector',
@@ -278,12 +279,18 @@ Vue.component('ScoreCard', {
      * Translates the shorthand metric scores to a more human friendly representation.
      */
     scoreToHumanFriendly: function () {
+      console.log(this.humanScores[this.metric][this.score])
       this.humanFriendlyScore = this.humanScores[this.metric][this.score];
+    },
+    humanScoreOptions: function () {
+      console.log(this.humanScores[this.metric])
+      this.humanFriendlyScoreOptions = this.humanScores[this.metric];
     }
   },
   mounted() {
     this.determineSeverity();
     this.scoreToHumanFriendly();
+    this.humanScoreOptions();
     this.tooltip = new bootstrap.Popover(this.$refs.card, {
       title: this.humanMetrics[this.metric],
       content: this.metricExplanations[this.metric][this.score],
