@@ -11,3 +11,7 @@ Remember to update the `vuedev` and `vueprod` variables in `build.sh` if updatin
 ## Updating CVSS
 
 This version of the CVSS calculator uses JavaScript from https://www.first.org/cvss/v3.1/use-design#techdesign. If First.org release a new version, they might also release updated JavaScript at a similar location.
+
+## Location
+
+The CVSS Calculator can be accessed at this address: https://gitlab-com.gitlab.io/gl-security/appsec/cvss-calculator/
