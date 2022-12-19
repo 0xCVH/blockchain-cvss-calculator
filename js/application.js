@@ -819,7 +819,8 @@ var app = new Vue({
           examples: [
             "Full read access to an instance",
             "Access tokens, runner tokens, session IDs",
-            "Private repositories"
+            "Private repositories",
+            "XSS with .com CSP bypass"
           ],
           cvss_metric: 'C:H',
           onSelect: () => {
@@ -833,7 +834,8 @@ var app = new Vue({
             'Access to private issue/MR titles but not their content',
             'Access to a small number of private issues/MR (one or a handful of projects, as opposed to being able to read any private issue on the instance)',
             "Access to private data that the attacker doesn't have access to anymore, but had access to in the past",
-            'Access to private data of minor importance (issue due dates, private project name, etc.)'
+            'Access to private data of minor importance (issue due dates, private project name, etc.)',
+            'XSS without .com CSP bypass'
           ],
           cvss_metric: 'C:L',
           onSelect: () => {
@@ -869,7 +871,8 @@ var app = new Vue({
           examples: [
             "Attacker can add a malicious Runner to a project where they don't have the required permissions to do so",
             "Attacker can add a malicious OAuth application to the victim's trusted apps",
-            'Attacker can modify data on the GitLab instance'
+            'Attacker can modify data on the GitLab instance',
+            'XSS with .com CSP bypass'
           ],
           cvss_metric: 'I:H',
           onSelect: () => {
@@ -883,7 +886,8 @@ var app = new Vue({
             'Able to modify private issue/MR titles but not their content',
             'Able to modify a small number of private issues/MR (one or a handful of projects, as opposed to being able to read any private issue on the instance)',
             "Able to modify private data that the attacker doesn't have access to anymore, but had access to in the past",
-            'Able to modify private data of minor importance (issue due dates, private project name, etc.)'
+            'Able to modify private data of minor importance (issue due dates, private project name, etc.)',
+            'XSS without .com CSP bypass'
           ],
           cvss_metric: 'I:L',
           onSelect: () => {
