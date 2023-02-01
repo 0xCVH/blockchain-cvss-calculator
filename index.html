@@ -50,11 +50,12 @@
         <p>For GitLab team member token disclosure, the suggested bounty amount would be as defined below. Note that to reach the "maintainer" level, the token needs to have maintainer access on gitlab-org/gitlab or an equivalent "production" project.
           <ul>
             <li>Leaked token for a non-prod system that doesn't match any criteria below: $500 (CI abuse possible)</li>
-            <li>Leaked token for a Developer+ direct member of a group or project under the gitlab-com or gitlab-org namespaces, without sensitive data: $1000</li>
+            <li>Leaked access token for a Developer+ direct member of a group or project under the gitlab-com or gitlab-org namespaces, without sensitive data: $1000</li>
             <li>Leaked non-maintainer access token on gitlab.com: $7,500</li>
             <li>Leaked maintainer access token on gitlab.com: $15,000</li>
             <li>Leaked admin access token on gitlab.com: $35,000</li>
             <li>Leaked product project maintainer or admin access token on staging.gitlab.com: $15,000 (no customer data, admin and maintainer have similar impact)</li>
+            <li>`Access token` could means any of the following personal access token, OAuth2 tokens, Impersonation tokens, Project access token, Group access tokens. `Other tokens` could could mean any of the following tokens, feed token, incoming email token, CI/CD job tokens, runner tokens. `Token` could mean any token with in the category of `Access token` or `Other token`. </li>
           </ul>
         </p>
         <p>Reports about intended behavior resulting in an update of our documentation will be rewarded with a $100 bounty, as long as this update is security related.</p>
