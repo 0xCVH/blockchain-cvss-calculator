@@ -153,7 +153,7 @@ Vue.component('Definitions', {
  * ScoreCard represents a single CVSS metric which is rendered in ScoreModal for each metric.
  */
 Vue.component('ScoreCard', {
-  props: ['metric', 'score'],
+  props: ['metric', 'score', 'cvssMetrics'],
   template: '#score-card-template',
   data () {
     return {
@@ -163,6 +163,7 @@ Vue.component('ScoreCard', {
       humanFriendlyScore: undefined,
       humanFriendlyScoreOptions: undefined,
       tooltip: null,
+      selectedValue: null,
       humanMetrics: {
         AV: 'Attack Vector',
         AC: 'Attack Complexity',
@@ -279,24 +280,45 @@ Vue.component('ScoreCard', {
      * Translates the shorthand metric scores to a more human friendly representation.
      */
     scoreToHumanFriendly: function () {
-      console.log(this.humanScores[this.metric][this.score])
       this.humanFriendlyScore = this.humanScores[this.metric][this.score];
     },
     humanScoreOptions: function () {
-      console.log(this.humanScores[this.metric])
       this.humanFriendlyScoreOptions = this.humanScores[this.metric];
+
+    },
+    updateCVSSScore: function (item, passedMetric, key) {
+      //aa
+      this.selectedValue = item;
+    
+      this.cvssMetrics[passedMetric] = key;
+
+      var vector = '';
+      if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
+        vector = CVSS.CVSSVersionIdentifier;
+      } else {
+        // Default to 3.1
+        vector = CVSS31.CVSSVersionIdentifier;
+      }
+      for (const [metric, value] of Object.entries(this.cvssMetrics)) {
+        vector += `/${metric}:${value}`
+      }
+      console.log('updated score in ui')
+      window.location.hash = `#vector=${vector}&range=${'new'}`;
+      // window.location.reload(true);
+
     }
+    
   },
   mounted() {
     this.determineSeverity();
     this.scoreToHumanFriendly();
     this.humanScoreOptions();
-    this.tooltip = new bootstrap.Popover(this.$refs.card, {
-      title: this.humanMetrics[this.metric],
-      content: this.metricExplanations[this.metric][this.score],
-      placement: 'bottom',
-      html: true,
-    });
+    // this.tooltip = new bootstrap.Popover(this.$refs.card, {
+    //   title: this.humanMetrics[this.metric],
+    //   content: this.metricExplanations[this.metric][this.score],
+    //   placement: 'bottom',
+    //   html: true,
+    // });
   }
 });
 
@@ -1023,6 +1045,7 @@ var app = new Vue({
      * for the current CVSS metrics.
      */
     goToScore: function () {
+      console.log('goToScore')
       const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
       window.location.hash = `#vector=${cvssVector}&range=${this.bountyRange}`;
     },
@@ -1030,16 +1053,27 @@ var app = new Vue({
      * Renders the CVSS score page / modal with the current CVSS metrics.
      */
     showScore: function () {
+      console.log('showScore')
+
+     // $('.modal').modal('destroy'); 
       const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
       let modalInstance = new ScoreModal({
         propsData: { cvssVector: cvssVector, bountyRange: this.bountyRange }
       });
+
+
       modalInstance.$mount();
       this.$el.appendChild(modalInstance.$el);
       let modal = new bootstrap.Modal(modalInstance.$el);
+
+      if (('.modal.show').length) {
+        console.log(modal)
+      }
+
       modalInstance.$el.addEventListener('hidden.bs.modal', (event) => {
         window.location.hash = "";
       });
+
       modal.show();
     },
     /**
