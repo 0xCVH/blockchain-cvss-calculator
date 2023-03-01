@@ -667,7 +667,8 @@ var app = new Vue({
           extra: 'Attacker can expoit the vulnerability at any time, always.',
           examples: [
             'IDOR using simple guessable ID',
-            "Stored XSS on a page that's part of the user's normal workflow (main project page, issue or merge request page, etc.)"
+            "Stored XSS on a page that's part of the user's normal workflow (main project page, issue or merge request page, etc.)",
+            'A certain setting has to have a non-default value to make the exploit possible but the vulnerability is easy to exploit. If a specific configuration is required for an attack to succeed, the vulnerable component should be scored assuming it is in that configuration, provided it is a reasonable configuration.'
           ],
           cvss_metric: 'AC:L',
           onSelect: () => {
@@ -679,7 +680,6 @@ var app = new Vue({
           extra: "Successful attack depends on conditions beyond the attacker's control.",
           examples: [
             'Knowledge of a private project name is required to carry out the attack',
-            'A certain setting has to have a non-default value to make the attack possible',
             'Exploitation depends on a specific timing and cannot always be reproduced'
           ],
           cvss_metric: 'AC:H',
