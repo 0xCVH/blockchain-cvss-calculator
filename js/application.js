@@ -923,7 +923,7 @@ var app = new Vue({
           extra: 'Access is denied to a critical resource or the entire system is affected',
           examples: [
             'Runners all stop picking up pipelines',
-            'GitLab instance taken down'
+            '1k+ reference architecture GitLab instance taken down with requests per seconds (RPS) < reference RPS'
           ],
           cvss_metric: 'A:H',
           onSelect: () => {

@@ -61,6 +61,15 @@
         <p>Reports about intended behavior resulting in an update of our documentation will be rewarded with a $100 bounty, as long as this update is security related.</p>
       </div>
     </div>
+
+    <div class="examples">
+      <h3>Clarifying notes</h3>
+      <p>
+        <ul>
+          <li>When evaluating Availability impacts for DoS that require sustained traffic, use the <a href="https://docs.gitlab.com/ee/administration/reference_architectures/1k_users.html">1k Reference Architecture</a>. The number of requests must be fewer than the "test request per seconds rates" and cause 10+ seconds of user-perceivable unavailability to rate the impact as <code>A:H</code>.</a></li>
+        </ul>
+      </p>
+    </div>
   </main>
 
   <script type="text/x-template" id="answer-template">
