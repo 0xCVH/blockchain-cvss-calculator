@@ -31,14 +31,14 @@
       <Definitions></Definitions>
 
       <div class="examples">
-        <h3>Other Bounty Examples</h3>
+        <h3 id="other-bounty-examples">Other Bounty Examples</h3>
         <p>The suggested bounty amounts for issues that aren't exploitable but we would like to reward regardless are defined below:
           <ul>
             <li>Self-XSS: $100</li>
             <li>Dangling DNS records pointing to an attacker-controllable service or IP address: $712</li>
           </ul>
         </p>
-        <h4>Non-CVSS Bounties</h4>
+        <h4 id="non-cvss-bounties">Non-CVSS Bounties</h4>
         <p>For leakage of GitLab customer data or other personal data, the suggested bounty amount would be as defined below. Note that each of these conditions presuppose that the data was leaked by GitLab and not the customer themselves:
           <ul>
             <li>Security-related documentation update: $100</li>
@@ -63,7 +63,7 @@
     </div>
 
     <div class="examples">
-      <h3>Clarifying notes</h3>
+      <h3 id="clarifying-notes">Clarifying notes</h3>
       <p>
         <ul>
           <li>When evaluating Availability impacts for DoS that require sustained traffic, use the <a href="https://docs.gitlab.com/ee/administration/reference_architectures/1k_users.html">1k Reference Architecture</a>. The number of requests must be fewer than the "test request per seconds rates" and cause 10+ seconds of user-perceivable unavailability to rate the impact as <code>A:H</code>.</a></li>
@@ -175,7 +175,7 @@
       <a href="#" v-on:click="toggleDefinitions" v-show="!definitionsShown">Show help & definitions.</a>
       <a href="#" v-on:click="toggleDefinitions" v-show="definitionsShown">Hide help & definitions.</a>
       <div v-show="definitionsShown">
-        <h3>Background</h3>
+        <h3 id="background">Background</h3>
         <p>
           Accuracy and consistency of these scores is important. At any time when deciding on a score do not hesitate to ask for advice in the Bug Bounty Council issue or by reaching out to team members by any way you see fit. All CVSS & bounty amounts are <a href="https://about.gitlab.com/handbook/engineering/security/security-engineering-and-research/application-security/runbooks/hackerone-process.html#awards">peer reviewed</a> as described in <a href="https://about.gitlab.com/handbook/engineering/security/security-engineering-and-research/application-security/runbooks/hackerone-process.html">our HackerOne Process runbook</a>.
         </p>
@@ -183,7 +183,7 @@
           CVSS is owned by FIRST and used by permission. This calculator is based on the <a href="https://www.first.org/cvss/user-guide">FIRST CVSS user guide</a>, especially the <a href="https://www.first.org/cvss/user-guide#Scoring-Rubrics">Scoring Rubrics section</a>. Remember, in particular, to "constrain impacts to a reasonable final impact which they are confident an attacker is able to achieve".
         </p>
         <p>Contribute to, fork, or view the history of this calculator at <a href="https://gitlab.com/gitlab-com/gl-security/appsec/cvss-calculator">https://gitlab.com/gitlab-com/gl-security/appsec/cvss-calculator</a>.</p>
-        <h3>Metrics</h3>
+        <h3 id="metrics">Metrics</h3>
         <table class="table table-striped table-sm">
           <thead>
             <tr>
