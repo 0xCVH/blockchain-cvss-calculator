@@ -680,7 +680,8 @@ var app = new Vue({
           extra: "Successful attack depends on conditions beyond the attacker's control.",
           examples: [
             'Knowledge of a private project name is required to carry out the attack',
-            'Exploitation depends on a specific timing and cannot always be reproduced'
+            'Exploitation depends on a specific timing and cannot always be reproduced',
+            'Exploitation depends on non-default configuration and functionality specific to GitLab.com, zero impact to self-managed instances',
           ],
           cvss_metric: 'AC:H',
           onSelect: () => {
