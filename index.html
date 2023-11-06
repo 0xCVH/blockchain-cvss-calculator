@@ -67,6 +67,7 @@
       <p>
         <ul>
           <li>When evaluating Availability impacts for DoS that require sustained traffic, use the <a href="https://docs.gitlab.com/ee/administration/reference_architectures/1k_users.html">1k Reference Architecture</a>. The number of requests must be fewer than the "test request per seconds rates" and cause 10+ seconds of user-perceivable unavailability to rate the impact as <code>A:H</code>.</a></li>
+          <li>The initial time to remediate is based on <a href="https://handbook.gitlab.com/handbook/security/threat-management/vulnerability-management/#remediation-slas">the SLAs in our handbook</a>. A vulnerabilities due date is assigned by automation when imported into GitLab, and can change over time based on a number of factors.</li>
         </ul>
       </p>
     </div>
@@ -148,6 +149,16 @@
             <div class="bounty text-center">
               <h2 class="display-6">💰 Suggested Bounty 💰</h2>
               <h3 class="display-5">{{ suggestedBounty }}</h3>
+            </div>
+
+            <div class="due-date text-center">
+              <p>
+                Initial <a href="https://handbook.gitlab.com/handbook/security/threat-management/vulnerability-management/#remediation-slas">time to remediate</a>:
+                <span v-if="severityCritical || severityHigh">30</span>
+                <span v-if="severityMedium">90</span>
+                <span v-if="severityLow">180</span>
+                days
+              </p>
             </div>
 
             <div class="bounty-range text-center">
