@@ -305,7 +305,7 @@ var ScoreModal = Vue.component('ScoreModal', {
     bountyRange: {
       type: String,
       default: function () {
-        return 'old';
+        return 'new';
       },
     },
     oldCVSSVersion: false,
@@ -528,7 +528,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyMarkdownLinkToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`[${this.cvssVector}](${this.locationWithoutFragment()}/#vector=${this.cvssVector}&range=${this.bountyRange}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty} / ${this.bountyRange} bounty range)`);
+      this.copyToClipboard(`[${this.cvssVector}](${this.locationWithoutFragment()}/#vector=${this.cvssVector} (${this.cvssScore} ${this.severity} / ${this.suggestedBounty})`);
       this.$refs.btnCopyMarkdownLink.innerText = "Copied URL to clipboard!";
     },
     /**
@@ -538,7 +538,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyURLToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`${this.locationWithoutFragment()}/#vector=${this.cvssVector}&range=${this.bountyRange}`);
+      this.copyToClipboard(`${this.locationWithoutFragment()}/#vector=${this.cvssVector}`);
       this.$refs.btnCopyUrl.innerText = "Copied URL to clipboard!";
     },
     /**
@@ -1021,7 +1021,7 @@ var app = new Vue({
      */
     goToScore: function () {
       const cvssVector = this.cvssMetricsToVector(this.cvssMetrics);
-      window.location.hash = `#vector=${cvssVector}&range=${this.bountyRange}`;
+      window.location.hash = `#vector=${cvssVector}`;
     },
     /**
      * Renders the CVSS score page / modal with the current CVSS metrics.
