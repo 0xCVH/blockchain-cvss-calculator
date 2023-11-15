@@ -528,7 +528,7 @@ var ScoreModal = Vue.component('ScoreModal', {
      */
     copyMarkdownLinkToClipboard: function (e) {
       e.preventDefault();
-      this.copyToClipboard(`[${this.cvssVector}](${this.locationWithoutFragment()}/#vector=${this.cvssVector} (${this.cvssScore} ${this.severity} / ${this.suggestedBounty})`);
+      this.copyToClipboard(`[${this.cvssVector}](${this.locationWithoutFragment()}/#vector=${this.cvssVector}) (${this.cvssScore} ${this.severity} / ${this.suggestedBounty})`);
       this.$refs.btnCopyMarkdownLink.innerText = "Copied URL to clipboard!";
     },
     /**
