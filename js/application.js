@@ -715,9 +715,9 @@ var app = new Vue({
         question: 'Are administrator or "high" privileges required?',
         answers: [{
           answer: 'Yes',
-          extra: 'The attack requires Maintainer/Owner membership to a specific project/group, or instance admin rights.',
+          extra: 'The attack requires Maintainer/Owner/Custom permissions to a specific project/group, or instance admin rights.',
           examples: [
-            "Maintainer/Owner role is required in victim's existing project/group to carry out the attack.",
+            "Maintainer/Owner/Custom permissions are required in victim's existing project/group to carry out the attack.",
             "Side note: high privilege users using a bug to sabotage their own projects is out of scope of our bug bounty program."
           ],
           cvss_metric: 'PR:H',
