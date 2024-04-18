@@ -14,4 +14,4 @@ This version of the CVSS calculator uses JavaScript from https://www.first.org/c
 
 ## Location
 
-The CVSS Calculator can be accessed at this address: https://gitlab-com.gitlab.io/gl-security/appsec/cvss-calculator/
+The CVSS Calculator can be accessed at this address: https://gitlab-com.gitlab.io/gl-security/product-security/appsec/cvss-calculator/
