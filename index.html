@@ -7,21 +7,64 @@
   <meta name="description" content="">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' cdn.jsdelivr.net; style-src 'self' cdn.jsdelivr.net; font-src 'self' cdn.jsdelivr.net">
   <title>GitLab CVSS Calculator</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+
   <link href="css/application.css" rel="stylesheet">
   <meta name="theme-color" content="#9b51e0">
+  <script src="js/darktoggle.js"></script>
 </head>
 
 <body>
+
+  <div class="container py-4 px-3 mx-auto">
+    <header class="d-md-flex align-items-md-center pb-3 mb-5 border-bottom">
+      <h1 class="h4 me-auto">
+
+        <a href="/" class="d-flex align-items-center text-body text-decoration-none">
+          <span>GitLab CVSS Calculator</span>
+        </a>
+      </h1>
+      <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center dropdown color-modes">
+          <button class="btn btn-link px-0 text-decoration-none dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme (dark)">
+            <i class="bi-moon-stars-fill"></i>
+            <span class="ms-2" id="bd-theme-text">Toggle theme</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme">
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                <i class="bi-sun-fill"></i>
+                Light
+              </button>
+            </li>
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="dark" aria-pressed="true">
+                <i class="bi-moon-stars-fill"></i>
+                Dark
+              </button>
+            </li>
+            <li>
+              <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto" aria-pressed="false">
+                <i class="bi-circle-half"></i>
+                Auto
+              </button>
+            </li>
+          </ul>
+        </div>
+        <a href="https://gitlab.com/gitlab-com/gl-security/product-security/appsec/cvss-calculator" target="_blank" rel="noopener" class="text-decoration-none">View source on GitLab</a>
+      </div>
+    </header>
+
+  </div>
+
   <main class="container">
     <div id="app">
-      <div class="bg-light p-5 rounded">
-        <h1>GitLab CVSS Calculator</h1>
-        <p class="lead">This calculator is used to calculate bounties for vulnerabilities reported to GitLab's <a href="https://hackerone.com/gitlab">Bug Bounty Program on HackerOne</a> or via our <a href="https://about.gitlab.com/security/disclosure/">Responsible Disclosure Policy</a>.
+      <p class="lead">
+          This calculator is used to calculate bounties for vulnerabilities reported to GitLab's <a href="https://hackerone.com/gitlab">Bug Bounty Program on HackerOne</a> or via our <a href="https://about.gitlab.com/security/disclosure/">Responsible Disclosure Policy</a>.
           Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.1/specification-document">CVSS</a>)
-          which is used to calculate a suggested bug bounty based on the impact.</p>
-      </div>
+          which is used to calculate a suggested bug bounty based on the impact.
+      </p>
 
       <transition name="slide-fade" mode="out-in">
         <Question v-bind:question="current_question" :key="current_question.question"></Question>
@@ -68,15 +111,19 @@
       <p>
         <ul>
           <li>When evaluating Availability impacts for DoS that require sustained traffic, use the <a href="https://docs.gitlab.com/ee/administration/reference_architectures/1k_users.html">1k Reference Architecture</a>. The number of requests must be fewer than the "test request per seconds rates" and cause 10+ seconds of user-perceivable unavailability to rate the impact as <code>A:H</code>.</a></li>
-          <li>The initial time to remediate is based on <a href="https://handbook.gitlab.com/handbook/security/threat-management/vulnerability-management/#remediation-slas">the SLAs in our handbook</a>. A vulnerabilities due date is assigned by automation when imported into GitLab, and can change over time based on a number of factors.</li>
+          <li>The initial time to remediate is based on <a href="https://handbook.gitlab.com/handbook/security/product-security/vulnerability-management/#remediation-slas">the SLAs in our handbook</a>. A vulnerabilities due date is assigned by automation when imported into GitLab, and can change over time based on a number of factors.</li>
         </ul>
       </p>
     </div>
   </main>
 
+  <script type="text/x-template" id="examples-template">
+    <span></span>
+  </script>
+
   <script type="text/x-template" id="answer-template">
     <div class="col-sm-6">
-      <div class="card answer text-center h-100 bg-light" v-on:click="answer.onSelect">
+      <div class="card answer text-center h-100" v-on:click="answer.onSelect">
         <div class="card-body">
           <h5 class="card-title">{{ answer.answer }}</h5>
           <h6 class="card-subtitle mb-2 text-muted" v-if="answer.extra">{{ answer.extra }}</h6>
@@ -154,7 +201,7 @@
 
             <div class="due-date text-center">
               <p>
-                Initial <a href="https://handbook.gitlab.com/handbook/security/threat-management/vulnerability-management/#remediation-slas">time to remediate</a>:
+                Initial <a href="https://handbook.gitlab.com/handbook/security/product-security/vulnerability-management/#remediation-slas">time to remediate</a>:
                 <span v-if="severityCritical || severityHigh">30</span>
                 <span v-if="severityMedium">90</span>
                 <span v-if="severityLow">180</span>
@@ -221,9 +268,8 @@
     </div>
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
-    crossorigin="anonymous"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
   <script src="js/cvsscalc30.js"></script>
   <script src="js/cvsscalc31.js"></script>

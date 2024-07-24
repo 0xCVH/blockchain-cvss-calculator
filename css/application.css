@@ -1,4 +1,4 @@
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css");
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
 
 @font-face{
     font-family: 'Source Sans 3';
@@ -6,7 +6,7 @@
     font-style: normal;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-ExtraLight.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-ExtraLight.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-ExtraLight.otf.woff') format('woff');
 }
 
 @font-face{
@@ -15,7 +15,7 @@
     font-style: italic;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-ExtraLightIt.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-ExtraLightIt.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-ExtraLightIt.otf.woff') format('woff');
 }
 
 @font-face{
@@ -24,7 +24,7 @@
     font-style: normal;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-Light.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-Light.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-Light.otf.woff') format('woff');
 }
 
 @font-face{
@@ -33,7 +33,7 @@
     font-style: italic;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-LightIt.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-LightIt.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-LightIt.otf.woff') format('woff');
 }
 
 @font-face{
@@ -42,7 +42,7 @@
     font-style: normal;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-Regular.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-Regular.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-Regular.otf.woff') format('woff');
 }
 
 @font-face{
@@ -51,7 +51,7 @@
     font-style: italic;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-It.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-It.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-It.otf.woff') format('woff');
 }
 
 @font-face{
@@ -60,7 +60,7 @@
     font-style: normal;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-Semibold.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-Semibold.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-Semibold.otf.woff') format('woff');
 }
 
 @font-face{
@@ -69,7 +69,7 @@
     font-style: italic;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-SemiboldIt.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-SemiboldIt.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-SemiboldIt.otf.woff') format('woff');
 }
 
 @font-face{
@@ -78,7 +78,7 @@
     font-style: normal;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-Bold.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-Bold.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-Bold.otf.woff') format('woff');
 }
 
 @font-face{
@@ -87,7 +87,7 @@
     font-style: italic;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-BoldIt.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-BoldIt.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-BoldIt.otf.woff') format('woff');
 }
 
 @font-face{
@@ -96,7 +96,7 @@
     font-style: normal;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-Black.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-Black.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-Black.otf.woff') format('woff');
 }
 
 @font-face{
@@ -105,7 +105,7 @@
     font-style: italic;
     font-stretch: normal;
     src: url('WOFF2/TTF/SourceSans3-BlackIt.ttf.woff2') format('woff2'),
-         url('WOFF/OTF/SourceSans3-BlackIt.otf.woff') format('woff');
+    url('WOFF/OTF/SourceSans3-BlackIt.otf.woff') format('woff');
 }
 
 slide-fade-enter-active {
@@ -115,7 +115,7 @@ slide-fade-enter-active {
     transition: all .1s cubic-bezier(1.0, 0.3, 0.5, 1.0);
 }
 .slide-fade-enter, .slide-fade-leave-to
-    /* .slide-fade-leave-active below version 2.1.8 */ {
+/* .slide-fade-leave-active below version 2.1.8 */ {
     transform: translateX(10px);
     opacity: 0;
 }
@@ -129,13 +129,11 @@ body {
 }
 
 a {
-    color: #6b4fbb;
     text-decoration: none;
     font-weight: 400;
 }
 
 a:hover {
-    color: #4b3589;
     text-decoration: underline;
 }
 
@@ -202,4 +200,45 @@ a:hover {
 
 .score-card {
     cursor: help;
+}
+
+
+.color-modes .dropdown-menu {
+    padding: 0.25rem;
+}
+
+.color-modes .dropdown-menu li + li {
+    margin-top: 0.125rem;
+}
+
+.color-modes .dropdown-item {
+    border-radius: 0.25rem;
+}
+
+.color-modes .active {
+    font-weight: 600;
+}
+
+.color-modes .active .bi {
+    display: block !important;
+}
+
+.icon-list {
+    padding-left: 0;
+    list-style: none;
+}
+
+.icon-list li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.25rem;
+}
+
+.icon-list li::before {
+    display: block;
+    flex-shrink: 0;
+    width: 1.5em;
+    height: 1.5em;
+    margin-right: 0.5rem;
+    content: "";
 }
