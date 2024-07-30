@@ -1,3 +1,5 @@
+const EventBus = new Vue();
+
 /**
  * QuestionAnswer represents the answers to a question.
  *
@@ -136,7 +138,8 @@ Vue.component('Definitions', {
               this.definitions.push({
                 metric_value: answer.cvss_metric,
                 extra: answer.extra,
-                examples: answer.examples
+                examples: answer.examples,
+                mitigations: answer.mitigations
               })
             }
           }
@@ -148,11 +151,105 @@ Vue.component('Definitions', {
     this.loadDefinitions();
   }
 });
+/**
+ * Explanations allows all metric scoring definitions
+ * to be viewed.
+ *
+ */
+Vue.component('Explanations', {
+  template: '#explanations-template',
+  // props: {
+  //   cvssVector: {
+  //     type: String,
+  //     required: false,
+  //   }
+  // },
+  data () {
+    return {
+      metrics: [],
+      cvssVector: '',
+      cvssScore: '',
+      severity: ''
+    }
+  },
+  // when created, listen for the EventBus trigger method called "updateExplanations"
+  created() {
+    EventBus.$on('updateExplanations', (vector) => this.updateExplanations(vector));
+  },
+  methods: {
+    updateExplanations: function(vector) {
+      this.cvssVector = vector;
+      this.calculateCVSS();
+      this.loadExplanations();
+    },
+    loadExplanations: function () {
+      // Reset metrics so we always start empty
+      this.metrics = [];
+
+      var showAll = false;
+      // If a vector isn't present, show all explanations
+      if (typeof this.cvssVector !== 'string' || this.cvssVector.length === 0) {
+        showAll = true;
+      }
+      var scoreCardInstance = new scoreCard();
+
+      // Iterate over the calculator's questions
+      for (let key in this.$parent.questions) {
+        question = this.$parent.questions[key];
+
+        for (let answer of question.answers) {
+          // Only look at questions that result in a CVSS Metric Value
+          if (typeof answer.cvss_metric !== 'undefined') {
+            // Only add to the table when it's present in the vector
+            if (showAll || (this.cvssVector.indexOf('/'+answer.cvss_metric) >= 0)) {
+              // Split answer.cvss_metric on :
+              var [metric, score] = answer.cvss_metric.split(':');
+
+              var humanMetric = scoreCardInstance.$data.humanMetrics[metric];
+              var humanScore = scoreCardInstance.$data.humanScores[metric][score];
+
+              this.metrics.push({
+                metric_value: answer.cvss_metric,
+                human_metric: humanMetric + ' - ' + humanScore,
+                extra: answer.extra,
+                examples: answer.examples,
+                mitigations: answer.mitigations,
+
+              })
+            }
+          }
+        }
+      }
+    },
+    /**
+     * Calculates the CVSS score from the metrics.
+     */
+    calculateCVSS: function () {
+      var score;
+
+      if (CVSS.vectorStringRegex_30.test(this.cvssVector)) {
+        score = CVSS.calculateCVSSFromVector(this.cvssVector);
+        this.oldCVSSVersion = true;
+      } else if (CVSS31.vectorStringRegex_31.test(this.cvssVector)) {
+        score = CVSS31.calculateCVSSFromVector(this.cvssVector);
+        this.oldCVSSVersion = false;
+      } else {
+        console.warn('Unknown CVSS version: ' + this.cvssVector);
+      }
+
+      this.cvssScore = score.baseMetricScore;
+      this.severity = score.baseSeverity;
+    },
+  },
+  mounted() {
+    this.loadExplanations();
+  }
+});
 
 /**
  * ScoreCard represents a single CVSS metric which is rendered in ScoreModal for each metric.
  */
-Vue.component('ScoreCard', {
+var scoreCard = Vue.component('ScoreCard', {
   props: ['metric', 'score'],
   template: '#score-card-template',
   data () {
@@ -167,7 +264,7 @@ Vue.component('ScoreCard', {
         AC: 'Attack Complexity',
         PR: 'Privileges Required',
         UI: 'User Interaction',
-        S: 'State',
+        S: 'Scope',
         C: 'Confidentiality',
         I: 'Integrity',
         A: 'Availability',
@@ -622,7 +719,14 @@ var app = new Vue({
         question: 'Can the vulnerability be exploited from across a router (OSI layer 3 network)?',
         answers: [{
           answer: 'Yes',
-          extra: 'Vulnerability is exploitable from across the internet. This is the case for nearly all GitLab security issues.',
+          extra: 'Vulnerability is exploitable using the internet. This is the case for nearly all GitLab security issues.',
+          examples: [
+            'Attack triggered by making a network request to GitLab.com.',
+            'Attack triggered by making a network request to a self-managed instance.'
+          ],
+          mitigations: [
+            'For self-managed, the scope is limited to insider threats when an instance is unreachable from the internet (e.g. behind a firewall). Adjusting to `AV:A` may approximate a realistic risk.'
+          ],
           cvss_metric: 'AV:N',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'N';
@@ -630,7 +734,7 @@ var app = new Vue({
           }
         }, {
           answer: 'No',
-          extra: 'Vulnerability is exploitable across a limited physical or logical network distance.',
+          extra: 'Attack must be launched from a limited physical or logical network distance.',
           cvss_metric: 'AV:A',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'A';
@@ -644,14 +748,17 @@ var app = new Vue({
         answers: [{
           answer: 'Yes',
           extra: 'Attacker requires physical access to the vulnerable component.',
-          cvss_metric: 'AV:L',
+          cvss_metric: 'AV:P',
           onSelect: () => {
-            this.app.cvssMetrics.AV = 'L'
+            this.app.cvssMetrics.AV = 'P'
             this.app.goToPage('attack_complexity_1');
           }
         }, {
           answer: 'No',
           extra: 'Attack is committed through a local application vulnerability, by the victim running something locally, or the attacker is able to log in locally.',
+          examples: [
+            'A malicious or compromised server administrator attacks after logging in to a self-managed instance server.'
+          ],
           cvss_metric: 'AV:L',
           onSelect: () => {
             this.app.cvssMetrics.AV = 'P';
@@ -666,9 +773,13 @@ var app = new Vue({
           answer: 'Yes',
           extra: 'Attacker can expoit the vulnerability at any time, always.',
           examples: [
-            'IDOR using simple guessable ID',
-            "Stored XSS on a page that's part of the user's normal workflow (main project page, issue or merge request page, etc.)",
-            'A certain setting has to have a non-default value to make the exploit possible but the vulnerability is easy to exploit. If a specific configuration is required for an attack to succeed, the vulnerable component should be scored assuming it is in that configuration, provided it is a reasonable configuration.'
+            'Accessing a resource just by knowing a simple, guessable ID',
+            'A proof-of-concept script exists and will reliably work any time',
+            "Stored Cross Site Scriping (XSS) on a page that's part of the user's normal workflow (main project page, issue or merge request page, etc.)",
+            'A certain setting has to have a non-default value to make the exploit possible but the vulnerability is otherwise easy to exploit. We assume that if a specific and reasonable configuration is required for an attack to succeed, the vulnerable component is in that configuration.'
+          ],
+          mitigations: [
+            'In some cases, disabling a feature can increase attack complexity to High (or make it impossible entirely).'
           ],
           cvss_metric: 'AC:L',
           onSelect: () => {
@@ -680,7 +791,13 @@ var app = new Vue({
           extra: "Successful attack depends on conditions beyond the attacker's control.",
           examples: [
             'Knowledge of a private project name is required to carry out the attack',
-            'Exploitation depends on a specific timing and cannot always be reproduced'
+            'Exploitation depends on a specific timing and cannot always be reproduced',
+            'Exploitation requires a setting to be in a discouraged and non-default state.'
+          ],
+          mitigations: [
+            'Do not use non-recommended settings.',
+            'Use new and more secure defaults when they are released.',
+            'On self-managed, do not enable disabled Feature Flags',
           ],
           cvss_metric: 'AC:H',
           onSelect: () => {
@@ -703,6 +820,9 @@ var app = new Vue({
             'Permission issues allowing an unauthenticated account to access confidential information through the API',
             "CSRF or reflected XSS issues, assuming a privileged account isn't required to craft the attack URL. (The attacker is logged out - PR:N - but the victim is logged in).",
           ],
+          mitigations: [
+            'For self-managed, the scope is limited to insider threats when an instance is unreachable from the internet (e.g. behind a firewall).'
+          ],
           cvss_metric: 'PR:N',
           onSelect: () => {
             this.app.cvssMetrics.PR = 'N';
@@ -720,6 +840,9 @@ var app = new Vue({
             "Maintainer/Owner/Custom permissions are required in victim's existing project/group to carry out the attack.",
             "Side note: high privilege users using a bug to sabotage their own projects is out of scope of our bug bounty program."
           ],
+          mitigations: [
+            'For self-managed with restricted sign ups, the scope is limited to insider threats.'
+          ],
           cvss_metric: 'PR:H',
           onSelect: () => {
             this.app.cvssMetrics.PR = 'H';
@@ -731,6 +854,9 @@ var app = new Vue({
           examples: [
             "An authenticated user is required to carry out the attack",
             "Maintainer/Owner role is required to carry out the attack. However, the attacker can carry out the attack by creating a new project/group and inviting the victim to it."
+          ],
+          mitigations: [
+            'For self-managed with restricted sign ups, the scope is limited to insider threats.'
           ],
           cvss_metric: 'PR:L',
           onSelect: () => {
@@ -777,6 +903,9 @@ var app = new Vue({
             'XSS (vulnerable component is the website, impacted component is the browser)',
             'SSRF in GitLab that allows fetching GCP metadata'
           ],
+          mitigations: [
+            'If the scope change is due to accessing protected CI/CD variables BUT your variables do not give access to another system, then `S:U` may be appropriate.'
+          ],
           cvss_metric: 'S:C',
           onSelect: () => {
             this.app.cvssMetrics.S = 'C';
@@ -785,6 +914,9 @@ var app = new Vue({
         }, {
           answer: 'No',
           extra: 'Impact is localized to the exploitable component.',
+          examples: [
+            'A vulnerability that allows a Developer to do something only a Maintainer should do. (Both the vulnerable and impacted component are GitLab).'
+          ],
           cvss_metric: 'S:U',
           onSelect: () => {
             this.app.cvssMetrics.S = 'U';
@@ -998,6 +1130,18 @@ var app = new Vue({
             this.bountyRange = urlParams.get('range');
           }
           this.showScore();
+          return;
+        } else {
+          console.warn("Invalid / unsupported CVSS:", this.cvssVector)
+        }
+      }
+
+      // Explain score if fragment matches `explain=<cvss vector>` URL param string.
+      if (urlParams.has('explain')) {
+        this.cvssVector = urlParams.get('explain');
+        if (this.validCVSS(this.cvssVector)) {
+          console.log("Explain", this.cvssVector);
+          EventBus.$emit('updateExplanations', this.cvssVector);
           return;
         } else {
           console.warn("Invalid / unsupported CVSS:", this.cvssVector)
