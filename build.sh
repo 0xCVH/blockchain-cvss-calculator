@@ -8,13 +8,14 @@ echo " + Copying CSS files to public/"
 cp -R css public/
 echo " + Copying JavasCript files to public/"
 cp -R js public/
-echo " + Copying index.html to public/"
+echo " + Copying index.html and explain.html to public/"
 cp index.html public/
+cp explain.html public/
 echo " + Replacing development Vue script with production version"
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  sed -i '' -e "s|${vuedev}|${vueprod}|g" public/index.html
+  sed -i '' -e "s|${vuedev}|${vueprod}|g" public/*.html
 else
-  sed -i -e "s|${vuedev}|${vueprod}|g" public/index.html
+  sed -i -e "s|${vuedev}|${vueprod}|g" public/*.html
 fi
 
 echo " + Done!"
