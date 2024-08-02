@@ -792,7 +792,8 @@ var app = new Vue({
           examples: [
             'Knowledge of a private project name is required to carry out the attack',
             'Exploitation depends on a specific timing and cannot always be reproduced',
-            'Exploitation requires a setting to be in a discouraged and non-default state.'
+            'Exploitation requires a setting to be in a discouraged and non-default state.',
+            'Victim need to visit a website on a domain that is different from the GitLab instance domain'
           ],
           mitigations: [
             'Do not use non-recommended settings.',
