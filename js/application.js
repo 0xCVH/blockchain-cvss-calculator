@@ -854,7 +854,7 @@ var app = new Vue({
           extra: 'The attack requires an authenticated user, or sub-Maintainer/sub-Owner membership to a specific group/project, or sub-admin instance rights.',
           examples: [
             "An authenticated user is required to carry out the attack",
-            "Maintainer/Owner role is required to carry out the attack. However, the attacker can carry out the attack by creating a new project/group and inviting the victim to it."
+            "Maintainer/Owner role is required to carry out the attack. However, the attacker can carry out the attack by creating a new project/group and inviting the victim to it (`UI` must be `N` in this case)."
           ],
           mitigations: [
             'For self-managed with restricted sign ups, the scope is limited to insider threats.'
