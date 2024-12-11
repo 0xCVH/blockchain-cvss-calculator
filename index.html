@@ -239,6 +239,38 @@
           CVSS is owned by FIRST and used by permission. This calculator is based on the <a href="https://www.first.org/cvss/user-guide">FIRST CVSS user guide</a>, especially the <a href="https://www.first.org/cvss/user-guide#Scoring-Rubrics">Scoring Rubrics section</a>. Remember, in particular, to "constrain impacts to a reasonable final impact which they are confident an attacker is able to achieve".
         </p>
         <p>Contribute to, fork, or view the history of this calculator at <a href="https://gitlab.com/-/ide/project/gitlab-com/gl-security/product-security/appsec/cvss-calculator">https://gitlab.com/-/ide/project/gitlab-com/gl-security/product-security/appsec/cvss-calculator</a>.</p>
+       
+        <h3 id="reasonableconfig">Reasonable Configuration Assumptions When Calculating Score</h3>
+
+        <h4 id="smconfig">Self-Managed (Official CVE)</h4>
+        <p>
+          <ul>
+            <li>User Registration: Admin approval is required for new user accounts</li>
+            <li><a href="https://docs.gitlab.com/ee/administration/settings/import_and_export_settings.html#configure-allowed-import-sources">Importers Functionality Enabled</a>: No</li>
+            <li>SAML Functionality Utilized: Instance or group SAML is not used</li>
+          </ul>
+        </p>
+
+        <h4 id="saasconfig">GitLab.com SaaS</h4>
+        <p>
+          <ul>
+            <li>Internet Reachability: Accessible from the Internet</li>
+            <li>User Registration: Allows public registration for end users</li>
+            <li><a href="https://docs.gitlab.com/ee/administration/settings/import_and_export_settings.html#configure-allowed-import-sources">Importers Functionality Enabled</a>: Yes</li>
+            <li>SAML Functionality Utilized: Only group SAML is used</li>
+          </ul>
+        </p>
+
+        <h4 id="dedicatedconfig">GitLab Dedicated</h4>
+        <p>
+          <ul>
+            <li>Internet Reachability: Not accessible from the Internet</li>
+            <li>User Registration: Public registration for end users is not enabled</li>
+            <li><a href="https://docs.gitlab.com/ee/administration/settings/import_and_export_settings.html#configure-allowed-import-sources">Importers Functionality Enabled</a>: No</li>
+            <li>SAML Functionality Utilized: Either instance or group SAML is used</li>
+          </ul>
+        </p>
+
         <h3 id="metrics">Metrics</h3>
         <table class="table table-striped table-sm">
           <thead>
