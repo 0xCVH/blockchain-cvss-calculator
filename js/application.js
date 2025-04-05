@@ -701,45 +701,36 @@ var app = new Vue({
     questions: {
       attack_vector_1: {
         title: 'Attack Vector',
-        question: 'Does the attacker exploit the vulnerable component via the network stack?',
+        question: 'Does the attacker exploit the vulnerable component (e.g., smart contract, node software, blockchain client) via the network stack?',
         answers: [{
           answer: 'Yes',
-          onSelect: () => {
-            this.app.goToPage('attack_vector_2');
-          }
+          onSelect: () => { this.app.goToPage('attack_vector_2'); }
         }, {
           answer: 'No',
-          onSelect: () => {
-            this.app.goToPage('attack_vector_3');
-          }
+          onSelect: () => { this.app.goToPage('attack_vector_3'); }
         }]
       },
       attack_vector_2: {
         title: 'Attack Vector',
-        question: 'Can the vulnerability be exploited from across a router (OSI layer 3 network)?',
+        question: 'Can the vulnerability be exploited from across a router (OSI layer 3 network), i.e., from anywhere on the internet or a permissionless blockchain network?',
         answers: [{
           answer: 'Yes',
-          extra: 'Vulnerability is exploitable using the internet. This is the case for nearly all GitLab security issues.',
+          extra: 'Vulnerability is exploitable using the public internet or a permissionless blockchain network. For smart contracts, this could mean an attacker can call the contract from any node on the network. For node software, it could mean the node is publicly reachable and can be exploited remotely.',
           examples: [
-            'Attack triggered by making a network request to GitLab.com.',
-            'Attack triggered by making a network request to a self-managed instance.'
+            'Attack triggered by sending a malicious transaction to a public blockchain.',
+            'Attack triggered by sending a specially-crafted message to a publicly-exposed node (e.g., geth).'
           ],
           mitigations: [
-            'For self-managed, the scope is limited to insider threats when an instance is unreachable from the internet (e.g. behind a firewall). Adjusting to `AV:A` may approximate a realistic risk.'
+            'Using firewall rules to limit inbound connections to your node software.',
+            'Ensuring smart contracts are audited and not publicly callable for critical functions if not intended.'
           ],
           cvss_metric: 'AV:N',
-          onSelect: () => {
-            this.app.cvssMetrics.AV = 'N';
-            this.app.goToPage('attack_complexity_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.AV = 'N'; this.app.goToPage('attack_complexity_1'); }
         }, {
           answer: 'No',
-          extra: 'Attack must be launched from a limited physical or logical network distance.',
+          extra: 'Attack must be launched from a limited physical or logical network distance (e.g. a private blockchain or local network).',
           cvss_metric: 'AV:A',
-          onSelect: () => {
-            this.app.cvssMetrics.AV = 'A';
-            this.app.goToPage('attack_complexity_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.AV = 'A'; this.app.goToPage('attack_complexity_1'); }
         }]
       },
       attack_vector_3: {
@@ -747,334 +738,261 @@ var app = new Vue({
         question: 'Does the attacker require physical access to the target?',
         answers: [{
           answer: 'Yes',
-          extra: 'Attacker requires physical access to the vulnerable component.',
+          extra: 'Attacker requires physical access to the vulnerable component (e.g., direct access to a hardware wallet or a node\'s physical machine).',
           cvss_metric: 'AV:P',
-          onSelect: () => {
-            this.app.cvssMetrics.AV = 'P'
-            this.app.goToPage('attack_complexity_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.AV = 'P'; this.app.goToPage('attack_complexity_1'); }
         }, {
           answer: 'No',
-          extra: 'Attack is committed through a local application vulnerability, by the victim running something locally, or the attacker is able to log in locally.',
+          extra: 'Attack is committed through local application or local network vulnerabilities (e.g. local privilege escalation on a node running the software, or the attacker can log in locally to the machine hosting the node).',
           examples: [
-            'A malicious or compromised server administrator attacks after logging in to a self-managed instance server.'
+            'A malicious or compromised node operator who already has local shell access to the server running geth or lighthouse.'
           ],
           cvss_metric: 'AV:L',
-          onSelect: () => {
-            this.app.cvssMetrics.AV = 'P';
-            this.app.goToPage('attack_complexity_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.AV = 'L'; this.app.goToPage('attack_complexity_1'); }
         }]
       },
       attack_complexity_1: {
         title: 'Attack Complexity',
-        question: 'Can the attacker exploit the vulnerability at will?',
+        question: 'Can the attacker exploit the vulnerability at will, without relying on luck or complex conditions?',
         answers: [{
           answer: 'Yes',
-          extra: 'Attacker can expoit the vulnerability at any time, always.',
+          extra: 'Attacker can exploit the vulnerability at any time, reliably. No unusual conditions or dependencies.',
           examples: [
-            'Accessing a resource just by knowing a simple, guessable ID',
-            'A proof-of-concept script exists and will reliably work any time',
-            "Stored Cross Site Scriping (XSS) on a page that's part of the user's normal workflow (main project page, issue or merge request page, etc.)",
-            'A certain setting has to have a non-default value to make the exploit possible but the vulnerability is otherwise easy to exploit. We assume that if a specific and reasonable configuration is required for an attack to succeed, the vulnerable component is in that configuration.'
+            'Calling a smart contract function that fails to check proper permissions, leading to immediate exploitation.',
+            'Sending a specially crafted peer-to-peer (P2P) message that always triggers the bug in node software.',
+            'A simple guessable transaction payload or hash that can be used for re-entrancy attacks in a smart contract.'
           ],
           mitigations: [
-            'In some cases, disabling a feature can increase attack complexity to High (or make it impossible entirely).'
+            'Disabling certain blockchain features or functions can sometimes increase complexity (or eliminate the vulnerability).',
+            'Implementing proper permission checks and security patterns in smart contracts (e.g., re-entrancy guards).'
           ],
           cvss_metric: 'AC:L',
-          onSelect: () => {
-            this.app.cvssMetrics.AC = 'L';
-            this.app.goToPage('privileges_required_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.AC = 'L'; this.app.goToPage('privileges_required_1'); }
         }, {
           answer: 'No',
-          extra: "Successful attack depends on conditions beyond the attacker's control.",
+          extra: 'Successful attack depends on conditions beyond the attacker\'s direct control (e.g., certain network states, specific block timing, or chain re-org conditions).',
           examples: [
-            'Knowledge of a private project name is required to carry out the attack',
-            'Exploitation depends on a specific timing and cannot always be reproduced',
-            'Exploitation requires a setting to be in a discouraged and non-default state.',
-            'Victim need to visit a website on a domain that is different from the GitLab instance domain'
+            'Exploit requires a specific timing related to block production that can\'t always be reproduced (e.g., front-running scenarios).',
+            'Exploitation requires the blockchain or client to be in a particular discouraged or non-default configuration.',
+            'The victim node or contract must be in a certain mode that is not typically enabled by default.'
           ],
           mitigations: [
-            'Do not use non-recommended settings.',
-            'Use new and more secure defaults when they are released.',
-            'On self-managed, do not enable disabled Feature Flags',
+            'Use recommended software configurations and defaults.',
+            'Avoid enabling experimental or non-standard client modes unless necessary and properly secured.'
           ],
           cvss_metric: 'AC:H',
-          onSelect: () => {
-            this.app.cvssMetrics.AC = 'H';
-            this.app.goToPage('privileges_required_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.AC = 'H'; this.app.goToPage('privileges_required_1'); }
         }]
       },
       privileges_required_1: {
         title: 'Privileges Required',
-        question: 'Must the attacker be authorized to the exploitable component prior to attack?',
+        question: 'Must the attacker be authorized or have special privileges within the blockchain environment (e.g., specialized roles or permissions) prior to the attack?',
         answers: [{
           answer: 'Yes',
-          onSelect: () => {
-            this.app.goToPage('privileges_required_2');
-          }
+          onSelect: () => { this.app.goToPage('privileges_required_2'); }
         }, {
           answer: 'No',
           examples: [
-            'Permission issues allowing an unauthenticated account to access confidential information through the API',
-            "CSRF or reflected XSS issues, assuming a privileged account isn't required to craft the attack URL. (The attacker is logged out - PR:N - but the victim is logged in).",
+            'Permission issues allowing an unauthenticated user to invoke a privileged smart contract function.',
+            'No authentication needed to exploit the node or chain (e.g., a DoS vulnerability in the P2P layer).'
           ],
           mitigations: [
-            'For self-managed, the scope is limited to insider threats when an instance is unreachable from the internet (e.g. behind a firewall).'
+            'Restrict public access to nodes whenever possible (firewalls, private networks).',
+            'Use on-chain or off-chain checks for contract permissions.'
           ],
           cvss_metric: 'PR:N',
-          onSelect: () => {
-            this.app.cvssMetrics.PR = 'N';
-            this.app.goToPage('user_interaction_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.PR = 'N'; this.app.goToPage('user_interaction_1'); }
         }]
       },
       privileges_required_2: {
         title: 'Privileges Required',
-        question: 'Are administrator or "high" privileges required?',
+        question: 'Are administrator (e.g., chain owner, privileged contract role) or \'high\' privileges required to exploit the vulnerability?',
         answers: [{
           answer: 'Yes',
-          extra: 'The attack requires Maintainer/Owner/Custom permissions to a specific project/group, or instance admin rights.',
+          extra: 'The attack requires high-level or administrative privileges in the blockchain ecosystem. For instance, only a privileged role in a smart contract or node admin rights can trigger the flaw.',
           examples: [
-            "Maintainer/Owner/Custom permissions are required in victim's existing project/group to carry out the attack.",
-            "Side note: high privilege users using a bug to sabotage their own projects is out of scope of our bug bounty program."
+            'Requires admin/owner role in the smart contract for critical functions.',
+            'Requires local or root access to the server running the blockchain node.'
           ],
           mitigations: [
-            'For self-managed with restricted sign ups, the scope is limited to insider threats.'
+            'Restrict privileged roles to trusted parties only.',
+            'Use multi-signature or DAO governance for critical changes, limiting direct admin power.'
           ],
           cvss_metric: 'PR:H',
-          onSelect: () => {
-            this.app.cvssMetrics.PR = 'H';
-            this.app.goToPage('user_interaction_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.PR = 'H'; this.app.goToPage('user_interaction_1'); }
         }, {
           answer: 'No',
-          extra: 'The attack requires an authenticated user, or sub-Maintainer/sub-Owner membership to a specific group/project, or sub-admin instance rights.',
+          extra: 'An authenticated user or a user with a non-critical role can carry out the attack. For example, an attacker needs a normal wallet address or membership in a private consortium chain but not a special admin key.',
           examples: [
-            "An authenticated user is required to carry out the attack",
-            "Maintainer/Owner role is required to carry out the attack. However, the attacker can carry out the attack by creating a new project/group and inviting the victim to it (`UI` must be `N` in this case)."
+            'Any participant with a valid blockchain address can create a transaction that exploits a vulnerability in the contract logic.',
+            'An authenticated node on a permissioned network can exploit a bug that affects consensus, but does not require highest-level privileges.'
           ],
           mitigations: [
-            'For self-managed with restricted sign ups, the scope is limited to insider threats.'
+            'For permissioned blockchains, limit membership and monitor node behavior.',
+            'Enforce principle of least privilege in smart contract roles.'
           ],
           cvss_metric: 'PR:L',
-          onSelect: () => {
-            this.app.cvssMetrics.PR = 'L';
-            this.app.goToPage('user_interaction_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.PR = 'L'; this.app.goToPage('user_interaction_1'); }
         }]
       },
       user_interaction_1: {
         title: 'User Interaction',
-        question: 'Does the attacker require some other user to perform an action?',
+        question: 'Does the attacker require some other user (or node) to perform an action (e.g., confirm a transaction, sign a message) for the exploit to succeed?',
         answers: [{
           answer: 'Yes',
-          extra: 'Successful attack requires user interaction.',
+          extra: 'Successful attack requires user (or another node/operator) interaction.',
           examples: [
-            'All vulnerabilities that need a victim to do any stort of action even if the action is only to log on GitLab, this includes all XSS and CSRF vulnerabilities'
+            'A phishing scenario where a user signs a transaction that triggers a hidden malicious contract call.',
+            'A victim must connect to a malicious node or accept some malicious on-chain action (e.g. setting a certain contract parameter) before exploitation is complete.'
           ],
           cvss_metric: 'UI:R',
-          onSelect: () => {
-            this.app.cvssMetrics.UI = 'R';
-            this.app.goToPage('scope_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.UI = 'R'; this.app.goToPage('scope_1'); }
         }, {
           answer: 'No',
-          extra: 'Attack can be accomplished without any user interaction.',
+          extra: 'Attack can be accomplished without any additional user or node interaction (e.g. purely network-based or automatically triggered in block production).',
           examples: [
-            'Any attack that would work even if the victim never logs back in to GitLab'
+            'A vulnerability in node consensus logic that can be exploited by simply broadcasting a malformed block or transaction with no user involvement.'
           ],
           cvss_metric: 'UI:N',
-          onSelect: () => {
-            this.app.cvssMetrics.UI = 'N';
-            this.app.goToPage('scope_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.UI = 'N'; this.app.goToPage('scope_1'); }
         }]
       },
       scope_1: {
         title: 'Scope',
-        question: 'Can the attacker affect a component whose authority is different than the vulnerable component?',
+        question: 'Can the attacker affect a component (on-chain or off-chain) whose authority is different than the vulnerable component?',
         answers: [{
           answer: 'Yes',
-          extra: 'Impact caused to systems beyond the exploitable component.',
+          extra: 'Impact extends beyond the vulnerable component, e.g. bridging to external systems, or accessing off-chain services and credentials.',
           examples: [
-            'Protected CI/CD variables (vulnerable component is GitLab, impacted component is a production server and/or 3rd party systems)',
-            'XSS (vulnerable component is the website, impacted component is the browser)',
-            'SSRF in GitLab that allows fetching GCP metadata'
+            'A smart contract that can read or manipulate external oracles, affecting real-world data.',
+            'A node exploit that gives the attacker access to host-level credentials or other services on the same machine.',
+            'A vulnerability in bridging software that affects another blockchain or system.'
           ],
           mitigations: [
-            'If the scope change is due to accessing protected CI/CD variables BUT your variables do not give access to another system, then `S:U` may be appropriate.'
+            'Isolate critical off-chain services from on-chain interactions wherever possible.',
+            'Restrict oracles and bridging contracts to trusted or well-audited providers.'
           ],
           cvss_metric: 'S:C',
-          onSelect: () => {
-            this.app.cvssMetrics.S = 'C';
-            this.app.goToPage('confidentiality_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.S = 'C'; this.app.goToPage('confidentiality_impact_1'); }
         }, {
           answer: 'No',
-          extra: 'Impact is localized to the exploitable component.',
+          extra: 'Impact is localized to the exploited smart contract or node software itself without crossing trust boundaries.',
           examples: [
-            'A vulnerability that allows a Developer to do something only a Maintainer should do. (Both the vulnerable and impacted component are GitLab).'
+            'A bug that allows unauthorized function calls within the same contract or node but does not affect other systems or on-chain components outside its scope.'
           ],
           cvss_metric: 'S:U',
-          onSelect: () => {
-            this.app.cvssMetrics.S = 'U';
-            this.app.goToPage('confidentiality_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.S = 'U'; this.app.goToPage('confidentiality_impact_1'); }
         }]
       },
       confidentiality_impact_1: {
         title: 'Confidentiality Impact',
-        question: 'Is there any impact to confidentiality?',
+        question: 'Is there any impact to confidentiality (e.g., exposure of private keys, sensitive on-chain data, node logs)?',
         answers: [{
           answer: 'Yes',
-          onSelect: () => {
-            this.app.goToPage('confidentiality_impact_2');
-          }
+          onSelect: () => { this.app.goToPage('confidentiality_impact_2'); }
         }, {
           answer: 'No',
-          extra: 'No confidential information is disclosed.',
+          extra: 'No confidential or sensitive information is disclosed.',
           cvss_metric: 'C:N',
-          onSelect: () => {
-            this.app.cvssMetrics.C = "N";
-            this.app.goToPage('integrity_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.C = 'N'; this.app.goToPage('integrity_impact_1'); }
         }]
       },
       confidentiality_impact_2: {
         title: 'Confidentiality Impact',
-        question: 'Can attacker obtain all information from impacted component, or is the disclosed information critical?',
+        question: 'Can the attacker obtain all, or a critical subset, of information from the impacted component (like private keys, entire node data, or privileged contract variables)?',
         answers: [{
           answer: 'Yes',
-          extra: 'All information is disclosed to attacker, or some critical information is disclosed.',
+          extra: 'All information is disclosed to the attacker, or a particularly critical piece of data is compromised.',
           examples: [
-            "Full read access to an instance",
-            "Access tokens, runner tokens, session IDs",
-            "Private repositories",
-            "XSS with .com CSP bypass"
+            'Full read access to private keys or entire node’s sensitive data directory.',
+            'Exfiltration of seed phrases stored in memory or logs.',
+            'Reading privileged private variables in a smart contract that reveal crucial financial data.'
           ],
           cvss_metric: 'C:H',
-          onSelect: () => {
-            this.app.cvssMetrics.C = 'H';
-            this.app.goToPage('integrity_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.C = 'H'; this.app.goToPage('integrity_impact_1'); }
         }, {
           answer: 'No',
-          extra: 'Some information can be obtained, and/or attacker does not have control over kind or degree.',
+          extra: 'Some information can be obtained, but attacker does not have full or unlimited read access, or only minor private data is exposed.',
           examples: [
-            'Access to private issue/MR titles but not their content',
-            'Access to a small number of private issues/MR (one or a handful of projects, as opposed to being able to read any private issue on the instance)',
-            "Access to private data that the attacker doesn't have access to anymore, but had access to in the past",
-            'Access to private data of minor importance (issue due dates, private project name, etc.)',
-            'XSS without .com CSP bypass'
+            'Access to small or non-critical amounts of data, such as partial contract state that was supposed to be hidden.',
+            'Exposure of public node logs that offer limited informational value but not keys or critical secrets.'
           ],
           cvss_metric: 'C:L',
-          onSelect: () => {
-            this.app.cvssMetrics.C = 'L';
-            this.app.goToPage('integrity_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.C = 'L'; this.app.goToPage('integrity_impact_1'); }
         }]
       },
       integrity_impact_1: {
         title: 'Integrity Impact',
-        question: 'Is there any impact to integrity?',
+        question: 'Is there any impact to the integrity of the system or data (e.g., tampering with smart contract state, forging transactions)?',
         answers: [{
           answer: 'Yes',
-          onSelect: () => {
-            this.app.goToPage('integrity_impact_2');
-          }
+          onSelect: () => { this.app.goToPage('integrity_impact_2'); }
         }, {
           answer: 'No',
-          extra: 'No integrity loss.',
+          extra: 'No integrity loss (e.g., read-only exposure without the ability to modify data).',
           cvss_metric: 'I:N',
-          onSelect: () => {
-            this.app.cvssMetrics.I = 'N';
-            this.app.goToPage('availability_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.I = 'N'; this.app.goToPage('availability_impact_1'); }
         }]
       },
       integrity_impact_2: {
         title: 'Integrity Impact',
-        question: 'Can attacker modify all information of impacted component, or is the modified information critical?',
+        question: 'Can the attacker modify all or critical data (e.g., entire contract state, forging blocks, altering node consensus)?',
         answers: [{
           answer: 'Yes',
-          extra: 'Attacker can modify any information at any time, or only some critical information can be modified.',
+          extra: 'Attacker can modify any information at any time, or specifically critical/privileged data.',
           examples: [
-            "Attacker can add a malicious Runner to a project where they don't have the required permissions to do so",
-            "Attacker can add a malicious OAuth application to the victim's trusted apps",
-            'Attacker can modify data on the GitLab instance',
-            'XSS with .com CSP bypass'
+            'Attacker can rewrite on-chain records or forge entire blocks in the chain consensus.',
+            'A smart contract exploit that grants the attacker unlimited minting capabilities or administrative control of critical functions.',
+            'A node software bug enabling unauthorized changes to the ledger’s state.'
           ],
           cvss_metric: 'I:H',
-          onSelect: () => {
-            this.app.cvssMetrics.I = 'H';
-            this.app.goToPage('availability_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.I = 'H'; this.app.goToPage('availability_impact_1'); }
         }, {
           answer: 'No',
-          extra: 'Some information can be altered, and/or attacker does not have control over kind or degree.',
+          extra: 'Some data can be altered, but not all or not the most critical data. Attack may allow partial or situational modifications.',
           examples: [
-            'Able to modify private issue/MR titles but not their content',
-            'Able to modify a small number of private issues/MR (one or a handful of projects, as opposed to being able to read any private issue on the instance)',
-            "Able to modify private data that the attacker doesn't have access to anymore, but had access to in the past",
-            'Able to modify private data of minor importance (issue due dates, private project name, etc.)',
-            'XSS without .com CSP bypass'
+            'Limited ability to update a small subset of contract state variables but not fully control the contract.',
+            'A node exploit letting attacker change minor configuration details but not the ledger itself.'
           ],
           cvss_metric: 'I:L',
-          onSelect: () => {
-            this.app.cvssMetrics.I = 'L';
-            this.app.goToPage('availability_impact_1');
-          }
+          onSelect: () => { this.app.cvssMetrics.I = 'L'; this.app.goToPage('availability_impact_1'); }
         }]
       },
       availability_impact_1: {
         title: 'Availability Impact',
-        question: 'Is there any impact to the availability of a resource?',
+        question: 'Is there any impact to the availability of a resource (e.g. node crashing, smart contract becoming unusable, DoS on the network)?',
         answers: [{
           answer: 'Yes',
-          extra: 'Note that being able to delete data in the application is considered integrity impact and not availability.',
-          onSelect: () => {
-            this.app.goToPage('availability_impact_2');
-          }
+          extra: 'The vulnerability can reduce or completely deny access to the blockchain component or node functionality.',
+          onSelect: () => { this.app.goToPage('availability_impact_2'); }
         }, {
           answer: 'No',
-          extra: 'No Availability impact.',
+          extra: 'No availability impact.',
           cvss_metric: 'A:N',
-          onSelect: () => {
-            this.app.cvssMetrics.A = 'N';
-            this.app.goToScore();
-          }
+          onSelect: () => { this.app.cvssMetrics.A = 'N'; this.app.goToScore(); }
         }]
       },
       availability_impact_2: {
         title: 'Availability Impact',
-        question: 'Can attacker completely deny access to affected component, or is the resource critical?',
+        question: 'Can the attacker completely deny access to the affected component or disrupt the blockchain network/consensus significantly?',
         answers: [{
           answer: 'Yes',
-          extra: 'Access is denied to a critical resource or the entire system is affected',
+          extra: 'Access is denied to a critical resource or the entire system is severely affected (e.g., chain halts, node crashes persistently).',
           examples: [
-            'Runners all stop picking up pipelines',
-            '1k+ reference architecture GitLab instance taken down with requests per seconds (RPS) < reference RPS'
+            'A DoS exploit that causes all nodes running a certain client version to crash, halting the network.',
+            'A block-level vulnerability that prevents block production or finalization across the network.'
           ],
           cvss_metric: 'A:H',
-          onSelect: () => {
-            this.app.cvssMetrics.A = 'H';
-            this.app.goToScore();
-          }
+          onSelect: () => { this.app.cvssMetrics.A = 'H'; this.app.goToScore(); }
         }, {
           answer: 'No',
-          extra: 'Reduced performance, or access is denied to a non-critical resource, or only a part of the system is affected',
+          extra: 'Reduced performance or partial disruption to some nodes or smart contracts, but not a total system-wide denial of service.',
           examples: [
-            'A small amount of projects are inaccessible but become available when the attack stops',
-            "A small amount of users can't use the instance"
+            'A minor or localized denial of service that makes some contracts temporarily unusable or some nodes slow to sync.',
+            'Only a subset of validators or block producers are impacted; network continues but less efficiently.'
           ],
           cvss_metric: 'A:L',
-          onSelect: () => {
-            this.app.cvssMetrics.A = 'L';
-            this.app.goToScore();
-          }
+          onSelect: () => { this.app.cvssMetrics.A = 'L'; this.app.goToScore(); }
         }]
       }
     }
