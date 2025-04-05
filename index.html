@@ -61,8 +61,11 @@
   <main class="container">
     <div id="app">
       <p class="lead">
-          This calculator is a fork of <a href="https://gitlab-com.gitlab.io/gl-security/product-security/appsec/cvss-calculator/">GitLab's CVSS Calculator</a>, with changes made to be more relevant to Blockchain and Web3 systems.</a>.
-          Answering the questions will calculate a severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.1/specification-document">CVSS</a>)
+          This calculator is a fork of <a href="https://gitlab-com.gitlab.io/gl-security/product-security/appsec/cvss-calculator/">GitLab's CVSS Calculator</a>, with changes made to be more relevant to Blockchain and Web3 systems</a>.
+          Answering the questions will calculate a suggested severity score using the Common Vulnerability Scoring System (<a href="https://www.first.org/cvss/v3.1/specification-document">CVSS</a>)
+      </p>
+      <p  class="lead">
+        Would love to hear your thoughts and improvments, just submit a Issue or PR on <a href="https://github.com/0xCVH/blockchain-cvss-calculator" target="_blank" rel="noopener" class="text-decoration-none">GitHub</a>
       </p>
 
       <transition name="slide-fade" mode="out-in">
@@ -84,7 +87,7 @@
     <div class="col-sm-6">
       <div class="card answer text-center h-100" v-on:click="answer.onSelect">
         <div class="card-body">
-          <h5 class="card-title">{{ answer.answer }}</h5>
+          <h5 class="card-title">{{ answer.answer }} <span v-if="answer.cvss_metric">({{ answer.cvss_metric }})</span></h5>
           <h6 class="card-subtitle mb-2 text-muted" v-if="answer.extra">{{ answer.extra }}</h6>
           <!-- <Examples v-if="answer.examples" v-bind:examples="answer.examples"></Examples> -->
         </div>
@@ -163,7 +166,7 @@
 
             <div class="bounty text-center">
               <h2 class="display-6">⚠️ Suggested Severity ⚠️</h2>
-              <h3 class="display-5">{{ severity }}</h3>
+              <h3 class="display-5"><strong>{{ severity }}</strong></h3>
             </div>
 
           </div>
